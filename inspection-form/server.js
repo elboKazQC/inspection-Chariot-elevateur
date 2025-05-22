@@ -17,6 +17,8 @@ app.post('/api/save', async (req, res) => {
         const fileName = `inspection_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
         const fullPath = path.join(SAVE_PATH, fileName);
 
+        // Ensure the destination folder exists before writing
+        await fs.mkdir(SAVE_PATH, { recursive: true });
         await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');
         res.json({ success: true, message: 'Fichier sauvegardé avec succès' });
     } catch (error) {
