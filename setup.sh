@@ -1,19 +1,15 @@
 #!/bin/bash
 
-# Création du fichier .env pour stocker la clé API OpenAI
-echo "Création du fichier .env..."
-echo "OPENAI_API_KEY=" > .env
+echo "➡️  Déplacement dans le dossier du projet..."
+cd inspection-form || exit 1
 
-# Installation des dépendances nécessaires
-echo "Installation des dépendances..."
-cd inspection-form
+echo "📦 Installation des dépendances OpenAI et Markdown..."
 npm install @openai/api dotenv react-markdown @types/react-markdown
 
-# Configuration de l'environnement
-echo "Configuration de l'environnement..."
+echo "🔧 Installation des dépendances générales..."
 npm install
 
-# Message de fin
-echo "Installation terminée!"
-echo "N'oubliez pas d'ajouter votre clé API OpenAI dans le fichier .env"
+echo "✅ Installation terminée !"
+echo "⚠️  N'oubliez pas d'ajouter votre clé API OpenAI dans le fichier .env"
+echo "➡️  Exemple :"
 echo "OPENAI_API_KEY=votre-clé-api"
