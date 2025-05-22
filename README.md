@@ -17,11 +17,16 @@ All `npm` commands must be run from the `inspection-form/` directory. The root
    ID.
 3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary
    in the `ngrok/` folder so that `ngrok/ngrok` exists.
-4. Start the app:
+4. Build the frontend and start the local server:
    ```bash
    cd inspection-form
-   npm start
+   npm run build
+   node server.js
    ```
+
+   The application will be available on `http://localhost:3000`. You can open
+   the same URL from another device on your network by replacing `localhost` with
+   your computer's IP address.
 
 ### Running tests
 After installing dependencies with `setup.sh` or `setup.ps1`, you can execute the unit tests:
@@ -32,7 +37,8 @@ npm test
 
 This runs `react-scripts` in non-interactive mode and reports the results in the console.
 
-The application will open in your browser at `http://localhost:3001` by default.
+When using `start-local.sh` for development the app opens at
+`http://localhost:3001`.
 
 ### Access from mobile devices
 

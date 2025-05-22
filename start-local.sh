@@ -3,7 +3,7 @@
 
 # Load PORT from .env if available
 PORT=${PORT:-$(grep -m1 '^PORT=' inspection-form/.env 2>/dev/null | cut -d '=' -f2)}
-[ -z "$PORT" ] && PORT=3000
+[ -z "$PORT" ] && PORT=3001
 
 # Determine local IP address (first non-loopback IPv4)
 IP=$(hostname -I | awk '{print $1}')
