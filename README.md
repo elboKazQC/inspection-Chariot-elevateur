@@ -8,9 +8,16 @@ This project provides a tablet-friendly web application to fill out forklift ins
 - Saves form data as JSON in your OneDrive using Microsoft Graph
 
 ## Setup
-1. Run `setup.sh` to install dependencies.
-2. Replace `YOUR_CLIENT_ID` in `inspection-form/src/App.tsx` and `inspection-form/src/services/OneDriveService.ts` with your Azure app Client ID.
-3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary in the `ngrok/` folder so that `ngrok/ngrok` exists.
+All `npm` commands must be run from the `inspection-form/` directory. The root
+`package.json` has been removed.
+
+1. Run `setup.sh` to install dependencies (it automatically runs `npm install`
+   inside `inspection-form/`).
+2. Replace `YOUR_CLIENT_ID` in `inspection-form/src/App.tsx` and
+   `inspection-form/src/services/OneDriveService.ts` with your Azure app Client
+   ID.
+3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary
+   in the `ngrok/` folder so that `ngrok/ngrok` exists.
 4. Start the app:
    ```bash
    cd inspection-form
