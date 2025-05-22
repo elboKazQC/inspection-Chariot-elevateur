@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeProvider, createTheme } from '@mui/material';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication } from '@azure/msal-browser';
 import InspectionForm from './components/InspectionForm';
@@ -15,7 +15,7 @@ const msalConfig = {
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -26,6 +26,7 @@ const theme = createTheme({
     },
   },
 });
+theme = responsiveFontSizes(theme);
 
 function App() {
   return (
