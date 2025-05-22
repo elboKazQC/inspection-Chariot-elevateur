@@ -19,7 +19,7 @@ import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import SignaturePad, { SignaturePadRef } from './SignaturePad';
 import { InspectionForm } from '../types/InspectionTypes';
 import { INSPECTION_SECTIONS } from '../constants/inspectionData';
-import { saveToOneDrive } from '../services/OneDriveService';
+import { saveLocally } from '../services/OneDriveService';
 
 // Styles personnalisés
 const InspectionCard = styled(Paper)(({ theme }) => ({
@@ -109,11 +109,10 @@ const InspectionFormComponent: React.FC = () => {
                 return;
             }
 
-            await saveToOneDrive(data);
+            await saveLocally(data);
             alert('Sauvegarde réussie');
             reset();
             signatureRef.current?.clear();
-            console.log('Form data:', data);
         } catch (error) {
             console.error('Error saving form:', error);
             alert('Erreur lors de la sauvegarde');
@@ -139,7 +138,7 @@ const InspectionFormComponent: React.FC = () => {
                                             variant="body1"
                                             sx={{ minWidth: { xs: '100%', sm: '200px' }, fontWeight: 500 }}
                                         >
-                                           {item.name}
+                                            {item.name}
                                         </Typography>
                                         <RadioGroup
                                             row
