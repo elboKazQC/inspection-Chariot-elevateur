@@ -37,13 +37,21 @@ The application will open in your browser at `http://localhost:3001` by default.
 
 ### Access from mobile devices
 
-To expose the local server and easily fill the form from a phone (e.g. an iPhone), run the helper script:
+If your PC and phone are on the same Wi‑Fi network you can simply browse to the computer’s local address. Determine the IP with `ipconfig` (Windows) or `hostname -I` (Linux/Mac) and open `http://YOUR_IP:3001` on the phone.
+
+For convenience, a helper script prints the URL and starts the server:
+
+```bash
+./start-local.sh
+```
+
+Alternatively, you can expose the server on the internet using `ngrok`:
 
 ```bash
 ./start-tunnel.sh
 ```
 
-This script launches the React application and opens an `ngrok` tunnel. The public URL displayed in the terminal can be opened on any device to access the form.
+The ngrok URL will work from anywhere but changes each time with the free plan. Using the local network avoids this issue and costs nothing. You may assign a static IP to your computer for a truly constant address.
 
 ## Usage
 Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to your OneDrive under the root folder.
