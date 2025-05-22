@@ -3,6 +3,7 @@
 
 export const saveLocally = async (formData: any) => {
     try {
+        console.log('Début de la sauvegarde...');
         // Use a relative URL so the request targets the same host that served
         // the application. This works whether the app is accessed from the
         // local machine or another device on the network.
@@ -14,17 +15,26 @@ export const saveLocally = async (formData: any) => {
             body: JSON.stringify(formData),
         });
 
+        console.log('Réponse reçue du serveur');
         const result = await response.json();
 
         if (!result.success) {
+            console.error('Erreur serveur:', result.message);
             throw new Error(result.message);
         }
 
         alert('Inspection sauvegardée avec succès');
         return { success: true };
-    } catch (error) {
-        console.error('Erreur lors de la sauvegarde:', error);
-        alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+    } catch (error: any) {
+        console.error('Erreur détaillée lors de la sauvegarde:', error);
+
+        // Afficher un message d'erreur plus détaillé
+        let errorMsg = 'Erreur lors de la sauvegarde. Veuillez réessayer.';
+        if (error.message) {
+            errorMsg += ` (${error.message})`;
+        }
+
+        alert(errorMsg);
         throw error;
     }
 };

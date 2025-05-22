@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Connexion à l'application d'inspection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .address {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .steps {
+            margin-top: 20px;
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .troubleshooting {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-left: 4px solid #ffcc00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Connexion à l'application d'inspection des chariots élévateurs</h1>
+
+        <p>Pour vous connecter à l'application depuis votre iPhone, essayez les adresses suivantes dans Safari ou
+            Chrome:</p>
+
+        <div class="address">http://10.136.136.143:3000</div>
+        <div class="address">http://172.21.160.1:3000</div>
+
+        <div class="steps">
+            <h2>Étapes à suivre:</h2>
+
+            <div class="step">
+                <h3>1. Assurez-vous que votre iPhone est connecté au même réseau WiFi que cet ordinateur</h3>
+                <p>Vérifiez que votre iPhone et cet ordinateur sont connectés au même réseau WiFi d'entreprise.</p>
+            </div>
+
+            <div class="step">
+                <h3>2. Essayez les deux adresses</h3>
+                <p>Essayez d'abord la première adresse. Si elle ne fonctionne pas, essayez la seconde.</p>
+            </div>
+
+            <div class="step">
+                <h3>3. Vérifiez si le serveur est accessible</h3>
+                <p>Sur votre iPhone, essayez d'ouvrir l'un des liens ci-dessus. Si la page se charge, l'application
+                    d'inspection devrait s'afficher.</p>
+            </div>
+        </div>
+
+        <div class="troubleshooting">
+            <h2>Dépannage:</h2>
+            <ul>
+                <li><strong>La page ne se charge pas:</strong> Le pare-feu de l'ordinateur pourrait bloquer les
+                    connexions. Demandez à l'administrateur système de créer une règle pour autoriser le port 3000.</li>
+                <li><strong>Message "Impossible d'établir une connexion":</strong> Vérifiez que le serveur est bien en
+                    cours d'exécution sur cet ordinateur.</li>
+                <li><strong>La page se charge mais l'application ne fonctionne pas:</strong> Essayez de rafraîchir la
+                    page ou de vider le cache du navigateur.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

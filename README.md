@@ -17,16 +17,24 @@ All `npm` commands must be run from the `inspection-form/` directory. The root
    ID.
 3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary
    in the `ngrok/` folder so that `ngrok/ngrok` exists.
-4. Build the frontend and start the local server:
-   ```bash
-   cd inspection-form
-   npm run build
-   node server.js
-   ```
 
-   The application will be available on `http://localhost:3000`. You can open
-   the same URL from another device on your network by replacing `localhost` with
-   your computer's IP address.
+## Building and Running
+### Development Mode (port 3001)
+For development with hot-reloading:
+```bash
+cd inspection-form
+npm start
+```
+The app will be available at `http://localhost:3001`.
+
+### Production Mode (port 3000)
+To build and run the production version:
+```bash
+cd inspection-form
+npm run build
+node server.js
+```
+The application will be available at `http://localhost:3000`. You can access it from another device on your network by replacing `localhost` with your computer's IP address.
 
 ### Running tests
 After installing dependencies with `setup.sh` or `setup.ps1`, you can execute the unit tests:
@@ -37,12 +45,9 @@ npm test
 
 This runs `react-scripts` in non-interactive mode and reports the results in the console.
 
-When using `start-local.sh` for development the app opens at
-`http://localhost:3001`.
-
 ### Access from mobile devices
 
-If your PC and phone are on the same Wi‑Fi network you can simply browse to the computer’s local address. Determine the IP with `ipconfig` (Windows) or `hostname -I` (Linux/Mac) and open `http://YOUR_IP:3001` on the phone.
+If your PC and phone are on the same Wi‑Fi network you can simply browse to the computer's local address. Determine the IP with `ipconfig` (Windows) or `hostname -I` (Linux/Mac) and open `http://YOUR_IP:3000` on the phone.
 
 For convenience, a helper script prints the URL and starts the server:
 
@@ -59,4 +64,4 @@ Alternatively, you can expose the server on the internet using `ngrok`:
 The ngrok URL will work from anywhere but changes each time with the free plan. Using the local network avoids this issue and costs nothing. You may assign a static IP to your computer for a truly constant address.
 
 ## Usage
-Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to the `Inspections` folder in your OneDrive.
+Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to your specified save directory.
