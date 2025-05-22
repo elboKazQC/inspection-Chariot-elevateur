@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
     Box,
@@ -12,15 +12,29 @@ import {
     Paper,
     Container,
 } from '@mui/material';
+import SignaturePad, { SignaturePadRef } from './SignaturePad';
 import { InspectionForm } from '../types/InspectionTypes';
 import { INSPECTION_SECTIONS } from '../constants/inspectionData';
 import { saveToOneDrive } from '../services/OneDriveService';
 
 const InspectionFormComponent: React.FC = () => {
-    const { control, handleSubmit } = useForm<InspectionForm>();
+    const signatureRef = useRef<SignaturePadRef>(null);
+    const { control, handleSubmit } = useForm<InspectionForm>({
+        defaultValues: {
+            date: '',
+            operator: '',
+            signature: '',
+            truckNumber: '',
+            registration: '',
+            department: '',
+        }
+    });
 
     const onSubmit = async (data: InspectionForm) => {
         try {
+            if (signatureRef.current) {
+                data.signature = signatureRef.current.getImage();
+            }
             await saveToOneDrive(data);
             console.log('Form data:', data);
         } catch (error) {
@@ -109,6 +123,26 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
+                    <Grid item xs={12} md={4} component="div">
+                        <Controller
+                            name="registration"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <TextField {...field} label="Immatriculation" fullWidth />
+                            )}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4} component="div">
+                        <Controller
+                            name="department"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <TextField {...field} label="Département" fullWidth />
+                            )}
+                        />
+                    </Grid>
                 </Grid>
 
                 <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
@@ -124,6 +158,14 @@ const InspectionFormComponent: React.FC = () => {
                 {Object.entries(INSPECTION_SECTIONS.operationalInspection).map(([key, section]) => (
                     renderInspectionSection(section, `operationalInspection.${key}`)
                 ))}
+
+                <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+                    Signature de l'opérateur
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                    <SignaturePad ref={signatureRef} />
+                </Box>
+                <Button variant="text" onClick={() => signatureRef.current?.clear()}>Effacer la signature</Button>
 
                 <Box sx={{ mt: 4, mb: 4 }}>
                     <Button variant="contained" color="primary" type="submit" size="large">
