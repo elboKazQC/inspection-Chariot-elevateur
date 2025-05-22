@@ -44,3 +44,8 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Forklift Inspection Form
+
+This application renders a digital version of the forklift inspection checklist. It includes fields for the operator information and a signature area. When the form is submitted, the data is uploaded to OneDrive as a JSON file.
+
