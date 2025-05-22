@@ -11,8 +11,7 @@ This project provides a tablet-friendly web application to fill out forklift ins
 All `npm` commands must be run from the `inspection-form/` directory. The root
 `package.json` has been removed.
 
-1. Run `setup.sh` to install dependencies (it automatically runs `npm install`
-   inside `inspection-form/`).
+1. Run `setup.sh` (or `setup.ps1` on Windows) to install dependencies in `inspection-form/`.
 2. Replace `YOUR_CLIENT_ID` in `inspection-form/src/App.tsx` and
    `inspection-form/src/services/OneDriveService.ts` with your Azure app Client
    ID.
@@ -25,7 +24,7 @@ All `npm` commands must be run from the `inspection-form/` directory. The root
    ```
 
 ### Running tests
-After installing dependencies with `setup.sh`, you can execute the unit tests:
+After installing dependencies with `setup.sh` or `setup.ps1`, you can execute the unit tests:
 ```bash
 cd inspection-form
 npm test
