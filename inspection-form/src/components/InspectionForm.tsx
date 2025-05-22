@@ -6,16 +6,76 @@ import {
     Button,
     Typography,
     Grid,
-    FormControlLabel,
-    Radio,
     RadioGroup,
     Paper,
     Container,
+    FormControl,
+    styled,
+    Collapse,
 } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import SignaturePad, { SignaturePadRef } from './SignaturePad';
 import { InspectionForm } from '../types/InspectionTypes';
 import { INSPECTION_SECTIONS } from '../constants/inspectionData';
 import { saveToOneDrive } from '../services/OneDriveService';
+
+// Styles personnalisés
+const InspectionCard = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius * 1.5,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    transition: 'box-shadow 0.2s ease',
+    '&:hover': {
+        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+    },
+}));
+
+const ItemBox = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(2),
+    padding: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    transition: 'background-color 0.2s ease',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+}));
+
+interface RadioButtonProps {
+    status: 'ok' | 'notOk' | null;
+}
+
+const RadioButton = styled(Box, {
+    shouldForwardProp: (prop) => prop !== 'status',
+})<RadioButtonProps>(({ theme, status }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(1, 2),
+    borderRadius: theme.shape.borderRadius,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    backgroundColor: status === 'ok'
+        ? theme.palette.success.light
+        : status === 'notOk'
+            ? theme.palette.error.light
+            : 'transparent',
+    color: status === 'ok'
+        ? theme.palette.success.main
+        : status === 'notOk'
+            ? theme.palette.error.main
+            : theme.palette.text.primary,
+    '&:hover': {
+        backgroundColor: status === 'ok'
+            ? theme.palette.success.light
+            : status === 'notOk'
+                ? theme.palette.error.light
+                : theme.palette.action.hover,
+    },
+}));
 
 const InspectionFormComponent: React.FC = () => {
     const signatureRef = useRef<SignaturePadRef>(null);
@@ -44,45 +104,71 @@ const InspectionFormComponent: React.FC = () => {
 
     const renderInspectionSection = (section: any, sectionName: string) => {
         return (
-            <Paper sx={{ p: 2, mb: 2 }} elevation={2}>
-                <Typography variant="h6" gutterBottom>
+            <InspectionCard>
+                <Typography variant="h6" gutterBottom sx={{ color: (theme) => theme.palette.primary.main }}>
                     {section.title}
                 </Typography>
                 <Grid container spacing={2}>
                     {section.items.map((item: any, index: number) => (
-                        <Box key={index} sx={{ width: '100%', p: 1 }}>
-                            <Box display="flex" alignItems="center" gap={2}>
-                                <Typography variant="body1">{item.name}</Typography>
-                                <Controller
-                                    name={`${sectionName}.items.${index}.isOk` as any}
-                                    control={control}
-                                    defaultValue={null}
-                                    render={({ field }) => (
-                                        <RadioGroup row {...field}>
-                                            <FormControlLabel value="ok" control={<Radio />} label="OK" />
-                                            <FormControlLabel value="notOk" control={<Radio />} label="Non OK" />
-                                        </RadioGroup>
-                                    )}
-                                />
-                                <Controller
-                                    name={`${sectionName}.items.${index}.comments` as any}
-                                    control={control}
-                                    defaultValue=""
-                                    render={({ field }) => (
-                                        <TextField
+                        <Box key={index} sx={{ width: '100%' }}>
+                            <Controller
+                                name={`${sectionName}.items.${index}.isOk` as any}
+                                control={control}
+                                defaultValue={null}
+                                render={({ field }) => (
+                                    <ItemBox>
+                                        <Typography variant="body1" sx={{ minWidth: '200px', fontWeight: 500 }}>
+                                            {item.name}
+                                        </Typography>
+                                        <RadioGroup
+                                            row
                                             {...field}
-                                            label="Commentaires"
-                                            variant="outlined"
-                                            size="small"
-                                            fullWidth
+                                            sx={{ display: 'flex', gap: 2 }}
+                                        >
+                                            <RadioButton
+                                                status={field.value === 'ok' ? 'ok' : null}
+                                                onClick={() => field.onChange('ok')}
+                                            >
+                                                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                                                <Typography variant="body2">OK</Typography>
+                                            </RadioButton>
+                                            <RadioButton
+                                                status={field.value === 'notOk' ? 'notOk' : null}
+                                                onClick={() => field.onChange('notOk')}
+                                            >
+                                                <CancelOutlinedIcon sx={{ mr: 1 }} />
+                                                <Typography variant="body2">Non OK</Typography>
+                                            </RadioButton>
+                                        </RadioGroup>
+
+                                        <Controller
+                                            name={`${sectionName}.items.${index}.comments` as any}
+                                            control={control}
+                                            defaultValue=""
+                                            render={({ field: commentField }) => (
+                                                <Collapse in={field.value === 'notOk'} sx={{ flexGrow: 1 }}>
+                                                    <TextField
+                                                        {...commentField}
+                                                        placeholder="Commentaires"
+                                                        variant="outlined"
+                                                        size="small"
+                                                        fullWidth
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <CommentOutlinedIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                                            ),
+                                                        }}
+                                                    />
+                                                </Collapse>
+                                            )}
                                         />
-                                    )}
-                                />
-                            </Box>
+                                    </ItemBox>
+                                )}
+                            />
                         </Box>
                     ))}
                 </Grid>
-            </Paper>
+            </InspectionCard>
         );
     };
     return (
