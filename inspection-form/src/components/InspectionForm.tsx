@@ -123,7 +123,9 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
+
                     <Grid item xs={12} md={4}>
+
                         <Controller
                             name="registration"
                             control={control}
@@ -133,7 +135,9 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
+
                     <Grid item xs={12} md={4}>
+
                         <Controller
                             name="department"
                             control={control}
