@@ -83,7 +83,7 @@ const RadioButton = styled(Box, {
 
 const InspectionFormComponent: React.FC = () => {
     const signatureRef = useRef<SignaturePadRef>(null);
-    const { control, handleSubmit } = useForm<InspectionForm>({
+    const { control, handleSubmit, reset } = useForm<InspectionForm>({
         defaultValues: {
             date: '',
             operator: '',
@@ -97,12 +97,26 @@ const InspectionFormComponent: React.FC = () => {
     const onSubmit = async (data: InspectionForm) => {
         try {
             if (signatureRef.current) {
+                if (signatureRef.current.isEmpty()) {
+                    alert('Veuillez ajouter votre signature.');
+                    return;
+                }
                 data.signature = signatureRef.current.getImage();
             }
+
+            if (!data.date) {
+                alert('Veuillez saisir la date.');
+                return;
+            }
+
             await saveToOneDrive(data);
+            alert('Sauvegarde réussie');
+            reset();
+            signatureRef.current?.clear();
             console.log('Form data:', data);
         } catch (error) {
             console.error('Error saving form:', error);
+            alert('Erreur lors de la sauvegarde');
         }
     };
 

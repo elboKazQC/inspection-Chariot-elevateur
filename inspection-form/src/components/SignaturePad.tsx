@@ -3,11 +3,13 @@ import React, { useRef, useImperativeHandle, forwardRef, useEffect } from 'react
 export interface SignaturePadRef {
   clear: () => void;
   getImage: () => string;
+  isEmpty: () => boolean;
 }
 
 const SignaturePad = forwardRef<SignaturePadRef>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
+  const hasSignature = useRef(false);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   useImperativeHandle(ref, () => ({
@@ -17,9 +19,13 @@ const SignaturePad = forwardRef<SignaturePadRef>((_, ref) => {
       if (ctx && canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
+      hasSignature.current = false;
     },
     getImage() {
       return canvasRef.current?.toDataURL('image/png') || '';
+    },
+    isEmpty() {
+      return !hasSignature.current;
     },
   }));
 
@@ -42,6 +48,7 @@ const SignaturePad = forwardRef<SignaturePadRef>((_, ref) => {
 
     const startDrawing = (x: number, y: number) => {
       drawing.current = true;
+      hasSignature.current = true;
       ctx.beginPath();
       ctx.moveTo(x, y);
     };
