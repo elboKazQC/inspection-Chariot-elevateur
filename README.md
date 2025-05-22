@@ -17,6 +17,15 @@ This project provides a tablet-friendly web application to fill out forklift ins
    npm start
    ```
 
+### Running tests
+After installing dependencies with `setup.sh`, you can execute the unit tests:
+```bash
+cd inspection-form
+npm test
+```
+
+This runs `react-scripts` in non-interactive mode and reports the results in the console.
+
 The application will open in your browser at `http://localhost:3001` by default.
 
 ### Access from mobile devices
