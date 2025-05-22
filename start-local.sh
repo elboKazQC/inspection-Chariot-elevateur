@@ -17,3 +17,4 @@ fi
 # Start the React application
 cd inspection-form || exit 1
 PORT=$PORT HOST=0.0.0.0 npm start
+ 
