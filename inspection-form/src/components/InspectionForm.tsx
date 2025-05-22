@@ -86,7 +86,7 @@ const InspectionFormComponent: React.FC = () => {
         );
     };
     return (
-        <Container maxWidth="lg">
+        <Container maxWidth="sm">
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 4 }}>
                 <Typography variant="h4" gutterBottom>
                     Fiche d'inspection des chariots élévateurs
