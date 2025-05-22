@@ -50,11 +50,11 @@ const InspectionFormComponent: React.FC = () => {
                 </Typography>
                 <Grid container spacing={2}>
                     {section.items.map((item: any, index: number) => (
-                        <Grid item xs={12} key={index} component="div">
+                        <Grid item xs={12} key={index}>
                             <Box display="flex" alignItems="center" gap={2}>
                                 <Typography variant="body1">{item.name}</Typography>
                                 <Controller
-                                    name={`${sectionName}.items.${index}.isOk`}
+                                    name={`${sectionName}.items.${index}.isOk` as any}
                                     control={control}
                                     defaultValue={null}
                                     render={({ field }) => (
@@ -65,7 +65,7 @@ const InspectionFormComponent: React.FC = () => {
                                     )}
                                 />
                                 <Controller
-                                    name={`${sectionName}.items.${index}.comments`}
+                                    name={`${sectionName}.items.${index}.comments` as any}
                                     control={control}
                                     defaultValue=""
                                     render={({ field }) => (
@@ -93,7 +93,7 @@ const InspectionFormComponent: React.FC = () => {
                 </Typography>
 
                 <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Grid item xs={12} md={4} component="div">
+                    <Grid item xs={12} md={4}>
                         <Controller
                             name="date"
                             control={control}
@@ -103,7 +103,7 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4} component="div">
+                    <Grid item xs={12} md={4}>
                         <Controller
                             name="operator"
                             control={control}
@@ -113,7 +113,7 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4} component="div">
+                    <Grid item xs={12} md={4}>
                         <Controller
                             name="truckNumber"
                             control={control}
@@ -123,7 +123,9 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4} component="div">
+
+                    <Grid item xs={12} md={4}>
+
                         <Controller
                             name="registration"
                             control={control}
@@ -133,7 +135,9 @@ const InspectionFormComponent: React.FC = () => {
                             )}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4} component="div">
+
+                    <Grid item xs={12} md={4}>
+
                         <Controller
                             name="department"
                             control={control}
