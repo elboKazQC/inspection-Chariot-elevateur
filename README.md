@@ -53,4 +53,4 @@ Alternatively, you can expose the server on the internet using `ngrok`:
 The ngrok URL will work from anywhere but changes each time with the free plan. Using the local network avoids this issue and costs nothing. You may assign a static IP to your computer for a truly constant address.
 
 ## Usage
-Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to your OneDrive under the root folder.
+Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to the `Inspections` folder in your OneDrive.
