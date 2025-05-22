@@ -50,7 +50,7 @@ const InspectionFormComponent: React.FC = () => {
                 </Typography>
                 <Grid container spacing={2}>
                     {section.items.map((item: any, index: number) => (
-                        <Grid item xs={12} key={index}>
+                        <Box key={index} sx={{ width: '100%', p: 1 }}>
                             <Box display="flex" alignItems="center" gap={2}>
                                 <Typography variant="body1">{item.name}</Typography>
                                 <Controller
@@ -79,7 +79,7 @@ const InspectionFormComponent: React.FC = () => {
                                     )}
                                 />
                             </Box>
-                        </Grid>
+                        </Box>
                     ))}
                 </Grid>
             </Paper>
@@ -93,7 +93,7 @@ const InspectionFormComponent: React.FC = () => {
                 </Typography>
 
                 <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Grid item xs={12} md={4}>
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
                         <Controller
                             name="date"
                             control={control}
@@ -102,8 +102,8 @@ const InspectionFormComponent: React.FC = () => {
                                 <TextField {...field} label="Date" type="date" fullWidth InputLabelProps={{ shrink: true }} />
                             )}
                         />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
+                    </Box>
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
                         <Controller
                             name="operator"
                             control={control}
@@ -112,8 +112,8 @@ const InspectionFormComponent: React.FC = () => {
                                 <TextField {...field} label="Opérateur" fullWidth />
                             )}
                         />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
+                    </Box>
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
                         <Controller
                             name="truckNumber"
                             control={control}
@@ -122,10 +122,9 @@ const InspectionFormComponent: React.FC = () => {
                                 <TextField {...field} label="# du chariot" fullWidth />
                             )}
                         />
-                    </Grid>
+                    </Box>
 
-                    <Grid item xs={12} md={4}>
-
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
                         <Controller
                             name="registration"
                             control={control}
@@ -134,10 +133,9 @@ const InspectionFormComponent: React.FC = () => {
                                 <TextField {...field} label="Immatriculation" fullWidth />
                             )}
                         />
-                    </Grid>
+                    </Box>
 
-                    <Grid item xs={12} md={4}>
-
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
                         <Controller
                             name="department"
                             control={control}
@@ -146,7 +144,7 @@ const InspectionFormComponent: React.FC = () => {
                                 <TextField {...field} label="Département" fullWidth />
                             )}
                         />
-                    </Grid>
+                    </Box>
                 </Grid>
 
                 <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
