@@ -43,6 +43,10 @@ const ItemBox = styled(Box)(({ theme }) => ({
     '&:hover': {
         backgroundColor: theme.palette.action.hover,
     },
+    [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+    },
 }));
 
 interface RadioButtonProps {
@@ -117,8 +121,11 @@ const InspectionFormComponent: React.FC = () => {
                                 defaultValue={null}
                                 render={({ field }) => (
                                     <ItemBox>
-                                        <Typography variant="body1" sx={{ minWidth: '200px', fontWeight: 500 }}>
-                                            {item.name}
+                                        <Typography
+                                            variant="body1"
+                                            sx={{ minWidth: { xs: '100%', sm: '200px' }, fontWeight: 500 }}
+                                        >
+                                           {item.name}
                                         </Typography>
                                         <RadioGroup
                                             row
@@ -146,7 +153,12 @@ const InspectionFormComponent: React.FC = () => {
                                             control={control}
                                             defaultValue=""
                                             render={({ field: commentField }) => (
-                                                <Collapse in={field.value === 'notOk'} sx={{ flexGrow: 1 }}>
+                                                <Collapse
+                                                    in={field.value === 'notOk'}
+                                                    timeout="auto"
+                                                    unmountOnExit
+                                                    sx={{ flexGrow: 1 }}
+                                                >
                                                     <TextField
                                                         {...commentField}
                                                         placeholder="Commentaires"
