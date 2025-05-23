@@ -184,22 +184,34 @@ function generatePDF(data) {
 
   doc.font('Helvetica-Bold')
     .fontSize(12)
-    .text('SIGNATURE', margin, signatureY - 40, { align: 'center', width: doc.page.width - 2 * margin });
+    .text('SIGNATURE', margin, signatureY - 60, { align: 'center', width: doc.page.width - 2 * margin });
 
   doc.font('Helvetica')
     .fontSize(10)
-    .text('Je déclare avoir effectué l\'inspection complète du chariot élévateur selon les normes de sécurité en vigueur.', margin, signatureY - 20, { width: doc.page.width - 2 * margin, align: 'justify' });
+    .text('Je déclare avoir effectué l\'inspection complète du chariot élévateur selon les normes de sécurité en vigueur.', margin, signatureY - 40, { width: doc.page.width - 2 * margin, align: 'justify' });
+
+  // Ajouter la signature numérique si elle existe
+  if (data.signature) {
+    try {
+      const base64Data = data.signature.split(',')[1] || data.signature;
+      const img = Buffer.from(base64Data, 'base64');
+      doc.image(img, margin, signatureY - 30, { width: 200, height: 60 });
+    } catch (err) {
+      console.error('Erreur lors de l\'insertion de la signature:', err);
+    }
+  }
 
   // Lignes de signature
-  doc.moveTo(margin, signatureY)
-    .lineTo(margin + 200, signatureY)
+  doc.moveTo(margin, signatureY + 40)
+    .lineTo(margin + 200, signatureY + 40)
     .stroke();
-  doc.text('Signature de l\'opérateur', margin, signatureY + 5, { width: 200 });
+  doc.text('Signature de l\'opérateur', margin, signatureY + 45, { width: 200 });
 
-  doc.moveTo(doc.page.width - margin - 200, signatureY)
-    .lineTo(doc.page.width - margin, signatureY)
+  doc.moveTo(doc.page.width - margin - 200, signatureY + 40)
+    .lineTo(doc.page.width - margin, signatureY + 40)
     .stroke();
-  doc.text('Date: ' + date, doc.page.width - margin - 200, signatureY + 5, { width: 200 });
+  doc.font('Helvetica')
+    .text('Date: ' + date, doc.page.width - margin - 200, signatureY + 45, { width: 200 });
 
   doc.moveDown(4);
 
