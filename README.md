@@ -5,7 +5,8 @@ This project provides a tablet-friendly web application to fill out forklift ins
 ## Features
 - React + TypeScript frontend using Material UI
 - Digital signature capture
-- Saves form data as JSON in your OneDrive using Microsoft Graph
+- Saves form data as JSON and automatically generates a PDF summary
+  next to the JSON file
 
 ## Setup
 All `npm` commands must be run from the `inspection-form/` directory. The root
@@ -64,4 +65,6 @@ Alternatively, you can expose the server on the internet using `ngrok`:
 The ngrok URL will work from anywhere but changes each time with the free plan. Using the local network avoids this issue and costs nothing. You may assign a static IP to your computer for a truly constant address.
 
 ## Usage
-Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**. A JSON file is uploaded to your specified save directory.
+Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**.
+The server stores the inspection as a JSON file and also creates a human
+readable PDF file in the same folder.
