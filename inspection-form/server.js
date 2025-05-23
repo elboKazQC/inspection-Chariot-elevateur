@@ -36,12 +36,10 @@ app.post('/api/save', async (req, res) => {
 
         // Ensure the destination folder exists before writing
         await fs.mkdir(SAVE_PATH, { recursive: true });
-        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');
-
-        // Write a PDF summary alongside the JSON file
+        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');        // Write a PDF summary alongside the JSON file
         try {
             const pdfPath = fullPath.replace(/\.json$/, '.pdf');
-            const pdfContent = generatePDF(formData);
+            const pdfContent = await generatePDF(formData);
             await fs.writeFile(pdfPath, pdfContent, 'binary');
             console.log('PDF créé avec succès');
         } catch (pdfErr) {
