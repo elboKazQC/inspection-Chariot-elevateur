@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 const os = require('os');
+const { generatePDF } = require('./pdfGenerator');
 const networkInterfaces = os.networkInterfaces();
 
 const app = express();
@@ -36,6 +37,17 @@ app.post('/api/save', async (req, res) => {
         // Ensure the destination folder exists before writing
         await fs.mkdir(SAVE_PATH, { recursive: true });
         await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');
+
+        // Write a PDF summary alongside the JSON file
+        try {
+            const pdfPath = fullPath.replace(/\.json$/, '.pdf');
+            const pdfContent = generatePDF(formData);
+            await fs.writeFile(pdfPath, pdfContent, 'binary');
+            console.log('PDF créé avec succès');
+        } catch (pdfErr) {
+            console.error('Erreur lors de la création du PDF:', pdfErr);
+        }
+
         console.log('Fichier sauvegardé avec succès');
         res.json({ success: true, message: 'Fichier sauvegardé avec succès' });
     } catch (error) {
