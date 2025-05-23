@@ -6,15 +6,17 @@ import {
     Button,
     Typography,
     Grid,
-    RadioGroup,
     Paper,
     Container,
-    FormControl,
     styled,
-    Collapse,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Checkbox,
 } from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import SignaturePad, { SignaturePadRef } from './SignaturePad';
 import { InspectionForm } from '../types/InspectionTypes';
@@ -33,53 +35,6 @@ const InspectionCard = styled(Paper)(({ theme }) => ({
     },
 }));
 
-const ItemBox = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(2),
-    padding: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    transition: 'background-color 0.2s ease',
-    '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-    },
-    [theme.breakpoints.down('sm')]: {
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-    },
-}));
-
-interface RadioButtonProps {
-    status: 'ok' | 'notOk' | null;
-}
-
-const RadioButton = styled(Box, {
-    shouldForwardProp: (prop) => prop !== 'status',
-})<RadioButtonProps>(({ theme, status }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(1, 2),
-    borderRadius: theme.shape.borderRadius,
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    backgroundColor: status === 'ok'
-        ? theme.palette.success.light
-        : status === 'notOk'
-            ? theme.palette.error.light
-            : 'transparent',
-    color: status === 'ok'
-        ? theme.palette.success.main
-        : status === 'notOk'
-            ? theme.palette.error.main
-            : theme.palette.text.primary,
-    '&:hover': {
-        backgroundColor: status === 'ok'
-            ? theme.palette.success.light
-            : status === 'notOk'
-                ? theme.palette.error.light
-                : theme.palette.action.hover,
-    },
-}));
 
 const InspectionFormComponent: React.FC = () => {
     const signatureRef = useRef<SignaturePadRef>(null);
@@ -125,138 +80,149 @@ const InspectionFormComponent: React.FC = () => {
                 <Typography variant="h6" gutterBottom sx={{ color: (theme) => theme.palette.primary.main }}>
                     {section.title}
                 </Typography>
-                <Grid container spacing={2}>
-                    {section.items.map((item: any, index: number) => (
-                        <Box key={index} sx={{ width: '100%' }}>
-                            <Controller
-                                name={`${sectionName}.items.${index}.isOk` as any}
-                                control={control}
-                                defaultValue={null}
-                                render={({ field }) => (
-                                    <ItemBox>
-                                        <Typography
-                                            variant="body1"
-                                            sx={{ minWidth: { xs: '100%', sm: '200px' }, fontWeight: 500 }}
-                                        >
-                                            {item.name}
-                                        </Typography>
-                                        <RadioGroup
-                                            row
-                                            {...field}
-                                            sx={{ display: 'flex', gap: 2 }}
-                                        >
-                                            <RadioButton
-                                                status={field.value === 'ok' ? 'ok' : null}
-                                                onClick={() => field.onChange('ok')}
-                                            >
-                                                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-                                                <Typography variant="body2">OK</Typography>
-                                            </RadioButton>
-                                            <RadioButton
-                                                status={field.value === 'notOk' ? 'notOk' : null}
-                                                onClick={() => field.onChange('notOk')}
-                                            >
-                                                <CancelOutlinedIcon sx={{ mr: 1 }} />
-                                                <Typography variant="body2">Non OK</Typography>
-                                            </RadioButton>
-                                        </RadioGroup>
-
+                <TableContainer>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Élément</TableCell>
+                                <TableCell align="center">OK</TableCell>
+                                <TableCell align="center">Non OK</TableCell>
+                                <TableCell align="center">N/A</TableCell>
+                                <TableCell>Commentaires</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {section.items.map((item: any, index: number) => (
+                                <TableRow key={index}>
+                                    <TableCell component="th" scope="row">
+                                        {item.name}
+                                    </TableCell>
+                                    <Controller
+                                        name={`${sectionName}.items.${index}.status` as any}
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <>
+                                                <TableCell align="center">
+                                                    <Checkbox
+                                                        checked={field.value === 'ok'}
+                                                        onChange={() => field.onChange('ok')}
+                                                        inputProps={{ 'aria-label': 'ok' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Checkbox
+                                                        checked={field.value === 'notOk'}
+                                                        onChange={() => field.onChange('notOk')}
+                                                        inputProps={{ 'aria-label': 'not ok' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Checkbox
+                                                        checked={field.value === 'na'}
+                                                        onChange={() => field.onChange('na')}
+                                                        inputProps={{ 'aria-label': 'na' }}
+                                                    />
+                                                </TableCell>
+                                            </>
+                                        )}
+                                    />
+                                    <TableCell>
                                         <Controller
                                             name={`${sectionName}.items.${index}.comments` as any}
                                             control={control}
                                             defaultValue=""
                                             render={({ field: commentField }) => (
-                                                <Collapse
-                                                    in={field.value === 'notOk'}
-                                                    timeout="auto"
-                                                    unmountOnExit
-                                                    sx={{ flexGrow: 1 }}
-                                                >
-                                                    <TextField
-                                                        {...commentField}
-                                                        placeholder="Commentaires"
-                                                        variant="outlined"
-                                                        size="small"
-                                                        fullWidth
-                                                        InputProps={{
-                                                            startAdornment: (
-                                                                <CommentOutlinedIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                                            ),
-                                                        }}
-                                                    />
-                                                </Collapse>
+                                                <TextField
+                                                    {...commentField}
+                                                    placeholder="Commentaires"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    fullWidth
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <CommentOutlinedIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                                        ),
+                                                    }}
+                                                />
                                             )}
                                         />
-                                    </ItemBox>
-                                )}
-                            />
-                        </Box>
-                    ))}
-                </Grid>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </InspectionCard>
         );
     };
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 4 }}>
-                <Typography variant="h4" gutterBottom>
-                    Fiche d'inspection des chariots élévateurs
-                </Typography>
-
-                <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
-                        <Controller
-                            name="date"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField {...field} label="Date" type="date" fullWidth InputLabelProps={{ shrink: true }} />
-                            )}
-                        />
-                    </Box>
-                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
-                        <Controller
-                            name="operator"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField {...field} label="Opérateur" fullWidth />
-                            )}
-                        />
-                    </Box>
-                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
-                        <Controller
-                            name="truckNumber"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField {...field} label="# du chariot" fullWidth />
-                            )}
-                        />
-                    </Box>
-
-                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
-                        <Controller
-                            name="registration"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField {...field} label="Immatriculation" fullWidth />
-                            )}
-                        />
-                    </Box>
-
-                    <Box sx={{ width: { xs: '100%', md: '33.33%' }, p: 1 }}>
-                        <Controller
-                            name="department"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField {...field} label="Département" fullWidth />
-                            )}
-                        />
-                    </Box>
-                </Grid>
+                <Paper sx={{ p: 3, mb: 4 }}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} md={2} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                            <img src="/logo192.png" alt="Logo Noovelia" style={{ height: 60 }} />
+                        </Grid>
+                        <Grid item xs={12} md={10}>
+                            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
+                                Fiche d'inspection des chariots élévateurs
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <Controller
+                                        name="date"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField {...field} label="Date" type="date" fullWidth InputLabelProps={{ shrink: true }} />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Controller
+                                        name="operator"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField {...field} label="Opérateur" fullWidth />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Controller
+                                        name="truckNumber"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField {...field} label="# du chariot" fullWidth />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Controller
+                                        name="registration"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField {...field} label="Immatriculation" fullWidth />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Controller
+                                        name="department"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField {...field} label="Département" fullWidth />
+                                        )}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Paper>
 
                 <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
                     Inspection visuelle

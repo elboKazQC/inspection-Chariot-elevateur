@@ -1,7 +1,13 @@
 export interface InspectionItem {
     name: string;
-    isOk: boolean | null;
-    needsAdjustment: boolean;
+    /**
+     * Status de l'item :
+     * - 'ok'     : conforme
+     * - 'notOk'  : non conforme
+     * - 'na'     : non applicable
+     * - ''       : non évalué
+     */
+    status: 'ok' | 'notOk' | 'na' | '';
     comments: string;
 }
 
