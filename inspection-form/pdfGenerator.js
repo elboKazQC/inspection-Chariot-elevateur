@@ -1,12 +1,51 @@
+function flattenObject(obj, prefix = '') {
+  return Object.keys(obj).reduce((acc, key) => {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof obj[key] === 'object' && obj[key] !== null && !(obj[key] instanceof Date) && !Array.isArray(obj[key])) {
+      Object.assign(acc, flattenObject(obj[key], newKey));
+    } else {
+      acc[newKey] = obj[key];
+    }
+    return acc;
+  }, {});
+}
+
+function cleanValue(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
+  if (Array.isArray(value)) return value.join(', ');
+  if (value instanceof Date) return value.toLocaleDateString();
+  return String(value);
+}
+
 function generatePDF(data) {
-  const lines = Object.entries(data).map(([k, v]) => `${k}: ${v}`);
+  // Aplatir l'objet et préparer les lignes de texte
+  const flatData = flattenObject(data);
+  const lines = Object.entries(flatData)
+    .filter(([_, v]) => v !== undefined && v !== null && v !== '')
+    .map(([k, v]) => `${k}: ${cleanValue(v)}`);
+
+  // Définir le contenu PDF
   let content = ['BT', '/F1 12 Tf'];
   let y = 750;
+
+  // En-tête
+  content.push('50 780 Td (Rapport d\'inspection de chariot élévateur) Tj');
+  y -= 30; // Espace après le titre
+
+  // Contenu principal
   for (const line of lines) {
+    if (y < 50) {
+      // Nouvelle page si on arrive en bas
+      content.push('ET', 'BT', '/F1 12 Tf', '50 750 Td');
+      y = 750;
+    }
+
     const esc = String(line).replace(/([()\\])/g, '\\$1');
     content.push(`50 ${y} Td (${esc}) Tj`);
     y -= 14;
   }
+
   content.push('ET');
   const contentStream = content.join('\n');
 
