@@ -181,20 +181,31 @@ function generatePDF(data) {
     .fontSize(10)
     .text('Je déclare avoir effectué l\'inspection complète du chariot élévateur selon les normes de sécurité en vigueur.', 50, 140, { width: 512 });
 
-  // Position fixe pour les lignes de signature
+  // Position fixe pour la zone de signature
   const signatureY = 200;
 
-  // Zone de signature - simplifiée avec juste une ligne
+  // Ligne et image de la signature
   doc.moveTo(50, signatureY)
     .lineTo(250, signatureY)
     .stroke();
   doc.text('Signature de l\'opérateur', 50, signatureY + 5);
 
-  // Zone de date - simplifiée avec juste une ligne
+  if (data.signature) {
+    try {
+      const base64 = data.signature.replace(/^data:image\/\w+;base64,/, '');
+      const img = Buffer.from(base64, 'base64');
+      doc.image(img, 50, signatureY - 60, { width: 200 });
+    } catch (err) {
+      console.error('Erreur lors de l\'ajout de la signature:', err);
+    }
+  }
+
+  // Zone de date avec valeur
   doc.moveTo(350, signatureY)
     .lineTo(550, signatureY)
     .stroke();
   doc.text('Date', 350, signatureY + 5);
+  doc.text(date, 350, signatureY - 15);
 
   doc.moveDown(4);
 
