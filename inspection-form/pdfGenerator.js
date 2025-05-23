@@ -1,15 +1,3 @@
-function flattenObject(obj, prefix = '') {
-  return Object.keys(obj).reduce((acc, key) => {
-    const newKey = prefix ? `${prefix}.${key}` : key;
-    if (typeof obj[key] === 'object' && obj[key] !== null && !(obj[key] instanceof Date) && !Array.isArray(obj[key])) {
-      Object.assign(acc, flattenObject(obj[key], newKey));
-    } else {
-      acc[newKey] = obj[key];
-    }
-    return acc;
-  }, {});
-}
-
 function cleanValue(value) {
   if (value === null || value === undefined) return '';
   if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
@@ -18,12 +6,34 @@ function cleanValue(value) {
   return String(value);
 }
 
+function formatSection(group) {
+  const lines = [];
+  for (const key of Object.keys(group || {})) {
+    const section = group[key];
+    lines.push(`- ${section.title}`);
+    for (const item of section.items || []) {
+      const status = item.isOk === 'ok' ? 'OK' : item.isOk === 'notOk' ? 'Non OK' : 'N/A';
+      const comment = item.comments ? ` (${cleanValue(item.comments)})` : '';
+      lines.push(`  • ${item.name}: ${status}${comment}`);
+    }
+    lines.push('');
+  }
+  return lines;
+}
+
 function generatePDF(data) {
-  // Aplatir l'objet et préparer les lignes de texte
-  const flatData = flattenObject(data);
-  const lines = Object.entries(flatData)
-    .filter(([_, v]) => v !== undefined && v !== null && v !== '')
-    .map(([k, v]) => `${k}: ${cleanValue(v)}`);
+  // Préparer les lignes du rapport avec une mise en forme simple
+  const lines = [];
+  lines.push(`Date: ${cleanValue(data.date)}`);
+  lines.push(`Opérateur: ${cleanValue(data.operator)}`);
+  lines.push(`Chariot #: ${cleanValue(data.truckNumber)}`);
+  lines.push(`Immatriculation: ${cleanValue(data.registration)}`);
+  lines.push(`Département: ${cleanValue(data.department)}`);
+  lines.push('');
+  lines.push('Inspection visuelle');
+  lines.push(...formatSection(data.visualInspection));
+  lines.push('Inspection opérationnelle');
+  lines.push(...formatSection(data.operationalInspection));
 
   // Définir le contenu PDF
   let content = ['BT', '/F1 12 Tf'];
