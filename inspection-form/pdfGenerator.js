@@ -1,4 +1,5 @@
 const PDFDocument = require('pdfkit');
+const { INSPECTION_SECTIONS } = require('./constants/inspectionData');
 
 function cleanValue(value) {
   if (value === null || value === undefined) return '';
@@ -59,104 +60,100 @@ function generatePDF(data) {
     .text('Immatriculation: ' + registration, 300, infoY + 20);
 
   doc.moveDown(3);
-  // ---------- TABLEAU D'INSPECTION VISUELLE ----------
-  doc.font('Helvetica-Bold')
-    .fontSize(12)
-    .text('INSPECTION VISUELLE', { underline: true, align: 'center' })
-    .moveDown(0.5);
+  // Fonction pour générer un tableau en utilisant la structure INSPECTION_SECTIONS
+  function drawInspectionTable(sectionData, sectionDefinition, startY) {
+    if (!sectionData || !sectionDefinition) return startY + 20;
 
-  // Fonction pour générer un tableau
-  function drawInspectionTable(sectionData, startY) {
-    if (!sectionData) return startY + 20;
+    const pageWidth = 512; // Largeur totale disponible
+    const margin = 50;
+    const col1Width = 200; // Élément à inspecter
+    const col2Width = 70;  // État OK
+    const col3Width = 70;  // État Non OK
+    const col4Width = 172; // Commentaires (512 - 200 - 70 - 70 = 172)
 
-    const pageWidth = 512; // Largeur disponible
-    const margin = 50;    // Largeur des colonnes - plus d'espacement
-    const col1Width = 190;
-    const col2Width = 85;
-    const col3Width = 85;
-    const col4Width = pageWidth - col1Width - col2Width - col3Width;
-
-    // Position Y pour commencer le tableau
     let y = startY;
-    const rowHeight = 20;
-
-    // En-tête du tableau
+    const rowHeight = 20;    // En-tête du tableau
     doc.font('Helvetica-Bold')
-      .fontSize(10);    // Lignes d'en-tête
+      .fontSize(10);
     doc.rect(margin, y, pageWidth, rowHeight).stroke();
-    doc.text('Élément', margin + 5, y + 5, { width: col1Width });
-    doc.text('OK', margin + col1Width + 35, y + 5, { width: col2Width, align: 'center' });
-    doc.text('Non OK', margin + col1Width + col2Width + 25, y + 5, { width: col3Width, align: 'center' });
-    doc.text('Commentaires', margin + col1Width + col2Width + col3Width + 15, y + 5, { width: col4Width - 15 });
+    doc.text('Élément à inspecter', margin + 5, y + 5, { width: col1Width - 10 });
+    doc.text('État OK', margin + col1Width + 10, y + 5, { width: col2Width - 20, align: 'center' });
+    doc.text('État Non OK', margin + col1Width + col2Width + 10, y + 5, { width: col3Width - 20, align: 'center' });
+    doc.text('Commentaires', margin + col1Width + col2Width + col3Width + 5, y + 5, { width: col4Width - 10 });
     y += rowHeight;
 
     // Corps du tableau
     doc.font('Helvetica')
       .fontSize(10);
 
-    // Parcourir les sections et les items
-    Object.keys(sectionData || {}).forEach(key => {
-      const section = sectionData[key];
+    // Parcourir les sections et les items définis dans INSPECTION_SECTIONS
+    sectionDefinition.items.forEach((itemDef, index) => {
+      const item = sectionData.items[index] || {};
 
-      // En-tête de section
-      doc.rect(margin, y, pageWidth, rowHeight).stroke();
-      doc.font('Helvetica-Bold')
-        .text(section.title || key, margin + 5, y + 5, { width: col1Width });
-      doc.font('Helvetica');
-      y += rowHeight;
+      // Vérifier s'il faut passer à une nouvelle page
+      if (y + rowHeight > doc.page.height - 50) { // Ajustement pour éviter les pages presque vides
+        doc.addPage();
+        y = 50;
 
-      // Items de la section
-      (section.items || []).forEach(item => {        // Vérifier s'il faut passer à une nouvelle page
-        if (y > 700) {
-          doc.addPage();
-          y = 50;
-
-          // Redessiner l'en-tête du tableau sur la nouvelle page
-          doc.font('Helvetica-Bold')
-            .fontSize(10); doc.rect(margin, y, pageWidth, rowHeight).stroke();
-          doc.text('Élément', margin + 5, y + 5, { width: col1Width });
-          doc.text('OK', margin + col1Width + 35, y + 5, { width: col2Width, align: 'center' });
-          doc.text('Non OK', margin + col1Width + col2Width + 25, y + 5, { width: col3Width, align: 'center' });
-          doc.text('Commentaires', margin + col1Width + col2Width + col3Width + 15, y + 5, { width: col4Width - 15 });
-          y += rowHeight;
-          doc.font('Helvetica')
-            .fontSize(10);
-        }
-
-        // Dessiner la ligne de l'item
+        // Redessiner l'en-tête du tableau sur la nouvelle page
+        doc.font('Helvetica-Bold')
+          .fontSize(10);
         doc.rect(margin, y, pageWidth, rowHeight).stroke();
-        doc.text(item.name, margin + 15, y + 5, { width: col1Width - 15 });        // Marquer la case OK ou Non OK avec X au lieu de crochets - centré dans les colonnes
-        if (item.isOk === 'ok') {
-          doc.text('X', margin + col1Width + 40, y + 5, { align: 'center', width: col2Width - 20 });
-        } else if (item.isOk === 'notOk') {
-          doc.text('X', margin + col1Width + col2Width + 35, y + 5, { align: 'center', width: col3Width - 20 });
-        } else {
-          // Ajouter un N/A visible
-          doc.text('N/A', margin + col1Width + 40, y + 5, { align: 'center', width: col2Width - 20 });
-        }
-
-        // Ajouter un commentaire s'il existe
-        if (item.comments) {
-          doc.text(cleanValue(item.comments), margin + col1Width + col2Width + col3Width + 5, y + 5, { width: col4Width - 10 });
-        }
-
+        doc.text('Élément à inspecter', margin + 5, y + 5, { width: col1Width - 10 });
+        doc.text('État OK', margin + col1Width + 10, y + 5, { width: col2Width - 20, align: 'center' });
+        doc.text('État Non OK', margin + col1Width + col2Width + 10, y + 5, { width: col3Width - 20, align: 'center' });
+        doc.text('Commentaires', margin + col1Width + col2Width + col3Width + 5, y + 5, { width: col4Width - 10 });
         y += rowHeight;
-      });
+      }      // Dessiner la ligne de l'item
+      doc.rect(margin, y, pageWidth, rowHeight).stroke();
+      doc.text(itemDef.name, margin + 5, y + 5, { width: col1Width - 10 });
+
+      // Marquer la case OK ou Non OK avec X
+      if (item.isOk === 'ok') {
+        doc.text('X', margin + col1Width + 20, y + 5, { align: 'center', width: col2Width - 20 });
+      } else if (item.isOk === 'notOk') {
+        doc.text('X', margin + col1Width + col2Width + 20, y + 5, { align: 'center', width: col3Width - 20 });
+      } else {
+        doc.text('N/A', margin + col1Width + 20, y + 5, { align: 'center', width: col2Width - 20 });
+      }
+
+      // Ajouter un commentaire s'il existe
+      if (item.comments) {
+        doc.text(cleanValue(item.comments), margin + col1Width + col2Width + col3Width + 5, y + 5, { width: col4Width - 10 });
+      }
+
+      y += rowHeight;
     });
 
     return y;
   }
 
+  // ---------- TABLEAU D'INSPECTION VISUELLE ----------
+  doc.font('Helvetica-Bold')
+    .fontSize(12)
+    .text('INSPECTION VISUELLE', { underline: true, align: 'center' })
+    .moveDown(0.5);
+
   // Dessiner le tableau d'inspection visuelle
   let currentY = doc.y;
-  currentY = drawInspectionTable(data.visualInspection, currentY);
-  doc.moveDown(1);  // ---------- TABLEAU D'INSPECTION OPÉRATIONNELLE ----------
+  Object.entries(data.visualInspection || {}).forEach(([key, section]) => {
+    if (INSPECTION_SECTIONS.visualInspection[key]) {
+      const sectionDef = INSPECTION_SECTIONS.visualInspection[key];
+      doc.font('Helvetica-Bold')
+        .fontSize(11)
+        .text(sectionDef.title)
+        .moveDown(0.5);
+      currentY = drawInspectionTable(section, sectionDef, doc.y);
+      doc.moveDown(1);
+    }
+  });
+
+  // ---------- TABLEAU D'INSPECTION OPÉRATIONNELLE ----------
   // Ajouter une nouvelle page si nécessaire
   if (currentY > 600) {
     doc.addPage();
     currentY = 50;
   } else {
-    // Ajouter plus d'espace entre les tableaux
     doc.moveDown(1);
     currentY = doc.y + 20;
   }
@@ -167,34 +164,42 @@ function generatePDF(data) {
     .moveDown(1);
 
   // Dessiner le tableau d'inspection opérationnelle
-  currentY = doc.y;
-  currentY = drawInspectionTable(data.operationalInspection, currentY);  // ---------- PIED DE PAGE ----------
+  Object.entries(data.operationalInspection || {}).forEach(([key, section]) => {
+    if (INSPECTION_SECTIONS.operationalInspection[key]) {
+      const sectionDef = INSPECTION_SECTIONS.operationalInspection[key];
+      doc.font('Helvetica-Bold')
+        .fontSize(11)
+        .text(sectionDef.title)
+        .moveDown(0.5);
+      currentY = drawInspectionTable(section, sectionDef, doc.y);
+      doc.moveDown(1);
+    }
+  });
+  // ---------- PIED DE PAGE ----------
   doc.addPage();
-  // Zone de signature - utiliser une position fixe depuis le haut pour plus de cohérence
-  const pageCenter = doc.page.width / 2;
+
+  // Zone de signature - position calculée depuis le haut de la page
+  const margin = 50;
+  const signatureY = doc.page.height - 150; // Position fixe pour garantir visibilité
 
   doc.font('Helvetica-Bold')
     .fontSize(12)
-    .text('SIGNATURE', pageCenter - 40, 100, { underline: true, align: 'center', width: 80 });
+    .text('SIGNATURE', margin, signatureY - 40, { align: 'center', width: doc.page.width - 2 * margin });
 
   doc.font('Helvetica')
     .fontSize(10)
-    .text('Je déclare avoir effectué l\'inspection complète du chariot élévateur selon les normes de sécurité en vigueur.', 50, 140, { width: 512 });
+    .text('Je déclare avoir effectué l\'inspection complète du chariot élévateur selon les normes de sécurité en vigueur.', margin, signatureY - 20, { width: doc.page.width - 2 * margin, align: 'justify' });
 
-  // Position fixe pour les lignes de signature
-  const signatureY = 200;
-
-  // Zone de signature - simplifiée avec juste une ligne
-  doc.moveTo(50, signatureY)
-    .lineTo(250, signatureY)
+  // Lignes de signature
+  doc.moveTo(margin, signatureY)
+    .lineTo(margin + 200, signatureY)
     .stroke();
-  doc.text('Signature de l\'opérateur', 50, signatureY + 5);
+  doc.text('Signature de l\'opérateur', margin, signatureY + 5, { width: 200 });
 
-  // Zone de date - simplifiée avec juste une ligne
-  doc.moveTo(350, signatureY)
-    .lineTo(550, signatureY)
+  doc.moveTo(doc.page.width - margin - 200, signatureY)
+    .lineTo(doc.page.width - margin, signatureY)
     .stroke();
-  doc.text('Date', 350, signatureY + 5);
+  doc.text('Date: ' + date, doc.page.width - margin - 200, signatureY + 5, { width: 200 });
 
   doc.moveDown(4);
 
