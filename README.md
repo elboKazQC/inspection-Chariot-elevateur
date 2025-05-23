@@ -19,6 +19,17 @@ All `npm` commands must be run from the `inspection-form/` directory. The root
 3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary
    in the `ngrok/` folder so that `ngrok/ngrok` exists.
 
+### Setup in Codex Environment
+
+If you're setting up the project in a Codex environment, use the following setup script:
+
+```bash
+cd inspection-form
+bash ./setup-codex.sh
+```
+
+This script handles permission issues that may occur in the Codex environment and provides alternative ways to run tests.
+
 ## Building and Running
 ### Development Mode (port 3001)
 For development with hot-reloading:
