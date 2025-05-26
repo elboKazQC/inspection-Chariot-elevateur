@@ -16,8 +16,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
 
-// Chemin principal - essaie d'abord le chemin original
-let SAVE_PATH = 'C:\\Users\\vcasaubon.NOOVELIA\\Noovelia\\!SST - General\\Inspection chariot élévateur\\Fiche inspection app';
+// Chemin principal - Dossier réseau
+let SAVE_PATH = 'C:\\Users\\SWARM\\Noovelia\\SST (SST) - Documents\\General\\Inspection chariot élévateur\\Fiche inspection app';
 // Alternative: créer un dossier dans le répertoire utilisateur courant
 const FALLBACK_PATH = path.join(os.homedir(), 'ForkliftInspections');
 

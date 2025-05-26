@@ -10,10 +10,27 @@ const fs = require('fs').promises;
 const { sendInspectionAlert } = require('./emailService');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.PORT || 3443;
 
-// Configuration CORS optimisée pour iOS
+// Chemin principal - Dossier réseau avec création si nécessaire
+let SAVE_PATH = 'C:\\Users\\SWARM\\Noovelia\\SST (SST) - Documents\\General\\Inspection chariot élévateur\\Fiche inspection app';
+// Fallback - Documents locaux
+const FALLBACK_PATH = path.join(os.homedir(), 'Documents', 'ForkliftInspections');
+
+// S'assurer que le dossier principal existe
+(async () => {
+    try {
+        await fs.mkdir(SAVE_PATH, { recursive: true });
+        console.log('✅ Dossier de sauvegarde principal créé/vérifié avec succès');
+    } catch (err) {
+        console.warn('⚠️ Impossible de créer le dossier principal:', err);
+        SAVE_PATH = FALLBACK_PATH;
+        await fs.mkdir(FALLBACK_PATH, { recursive: true });
+    }
+})();
+
+// Configuration CORS spécifique pour iOS avec HTTPS
 const corsOptions = {
     origin: function (origin, callback) {
         // Autoriser toutes les origines pour les tests iOS
@@ -187,8 +204,8 @@ app.post('/api/save', async (req, res) => {
         const fileName = `inspection_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
 
         // Utiliser le chemin de sauvegarde
-        let SAVE_PATH = 'C:\\Users\\vcasaubon.NOOVELIA\\Noovelia\\!SST - General\\Inspection chariot élévateur\\Fiche inspection app';
-        const FALLBACK_PATH = path.join(os.homedir(), 'ForkliftInspections');
+        let SAVE_PATH = 'C:\\Users\\SWARM\\Noovelia\\SST (SST) - Documents\\General\\Inspection chariot élévateur\\Fiche inspection app';
+        const FALLBACK_PATH = path.join(os.homedir(), 'Documents', 'ForkliftInspections');
         
         try {
             await fs.access(SAVE_PATH);

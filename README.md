@@ -1,25 +1,33 @@
-# Forklift Inspection App
+# Application d'Inspection de Chariot Élévateur
 
-This project provides a tablet-friendly web application to fill out forklift inspection forms and save the result to OneDrive.
+Cette application web permet de remplir des formulaires d'inspection de chariot élévateur et sauvegarde les résultats dans un dossier réseau partagé.
 
-## Features
-- React + TypeScript frontend using Material UI
-- Digital signature capture
-- Saves form data as JSON and automatically generates a PDF summary
-  next to the JSON file
+## Fonctionnalités
+- Interface utilisateur adaptée aux tablettes
+- Capture de signature numérique
+- Sauvegarde des données en JSON avec génération automatique de PDF
+- Support optimisé pour les appareils iOS
 
-## Setup
-All `npm` commands must be run from the `inspection-form/` directory. The root
-`package.json` has been removed.
+## Configuration requise
+1. Node.js (version LTS recommandée)
+2. Un navigateur web moderne (Chrome, Firefox, Safari)
+3. Pour les appareils iOS : Safari
 
-1. Run `setup.sh` (or `setup.ps1` on Windows) to install dependencies in `inspection-form/`.
-2. Replace `YOUR_CLIENT_ID` in `inspection-form/src/App.tsx` and
-   `inspection-form/src/services/OneDriveService.ts` with your Azure app Client
-   ID.
-3. (Optional) [Download ngrok](https://ngrok.com/download) and place the binary
-   in the `ngrok/` folder so that `ngrok/ngrok` exists.
+## Installation
 
-### Setup in Codex Environment
+1. Ouvrir PowerShell en tant qu'administrateur
+2. Exécuter la commande suivante pour autoriser l'exécution des scripts :
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+3. Naviguer vers le dossier du projet :
+   ```powershell
+   cd "c:\Users\SWARM\Documents\GitHub\inspection-Chariot-elevateur\inspection-form"
+   ```
+4. Installer les dépendances :
+   ```powershell
+   npm install
+   ```
 
 If you're setting up the project in a Codex environment, use the following setup script:
 
@@ -30,23 +38,36 @@ bash ./setup-codex.sh
 
 This script handles permission issues that may occur in the Codex environment and provides alternative ways to run tests.
 
-## Building and Running
-### Development Mode (port 3001)
-For development with hot-reloading:
-```bash
-cd inspection-form
-npm start
-```
-The app will be available at `http://localhost:3001`.
+## Démarrage de l'application
 
-### Production Mode (port 3000)
-To build and run the production version:
-```bash
-cd inspection-form
-npm run build
-node server.js
-```
-The application will be available at `http://localhost:3000`. You can access it from another device on your network by replacing `localhost` with your computer's IP address.
+### Pour les appareils iOS (iPhone, iPad)
+1. Ouvrir PowerShell en tant qu'administrateur
+2. Exécuter les commandes suivantes :
+   ```powershell
+   cd "c:\Users\SWARM\Documents\GitHub\inspection-Chariot-elevateur\inspection-form"
+   Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force
+   Start-Sleep 2
+   node server-https-ios.js
+   ```
+3. L'application sera accessible aux adresses suivantes :
+   - Localement : https://localhost:3443
+   - Sur le réseau : https://[VOTRE-IP]:3443
+4. Sur iOS, lors de la première connexion :
+   - Accepter le certificat auto-signé
+   - Autoriser l'accès à la caméra pour la signature
+
+### Pour les autres appareils (Android, PC)
+1. Ouvrir PowerShell en tant qu'administrateur
+2. Exécuter les commandes suivantes :
+   ```powershell
+   cd "c:\Users\SWARM\Documents\GitHub\inspection-Chariot-elevateur\inspection-form"
+   Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force
+   Start-Sleep 2
+   node server.js
+   ```
+3. L'application sera accessible aux adresses suivantes :
+   - Localement : http://localhost:3000
+   - Sur le réseau : http://[VOTRE-IP]:3000
 
 ### Running tests
 After installing dependencies with `setup.sh` or `setup.ps1`, you can execute the unit tests:
@@ -75,7 +96,38 @@ Alternatively, you can expose the server on the internet using `ngrok`:
 
 The ngrok URL will work from anywhere but changes each time with the free plan. Using the local network avoids this issue and costs nothing. You may assign a static IP to your computer for a truly constant address.
 
-## Usage
-Fill in the fields, sign with your finger or a stylus, and click **Enregistrer**.
-The server stores the inspection as a JSON file and also creates a human
-readable PDF file in the same folder.
+## Emplacement des fichiers
+
+Les inspections sont sauvegardées dans le dossier :
+```
+C:\Users\SWARM\Noovelia\SST (SST) - Documents\General\Inspection chariot élévateur\Fiche inspection app
+```
+
+Pour chaque inspection, deux fichiers sont générés :
+- Un fichier JSON (données brutes)
+- Un fichier PDF (rapport formaté)
+
+## Diagnostic
+
+### Tests rapides
+- Test de connexion : https://localhost:3443/api/test
+- Test PDF : https://localhost:3443/api/test-pdf
+- Test Email : https://localhost:3443/api/test-email
+- Page de diagnostic : https://localhost:3443/connection-info
+
+## Dépannage
+
+1. Si l'application ne démarre pas :
+   - Vérifier que Node.js est installé
+   - Vérifier que toutes les dépendances sont installées (npm install)
+   - S'assurer qu'aucun autre serveur n'utilise les ports 3000 ou 3443
+
+2. Si les fichiers ne sont pas sauvegardés au bon endroit :
+   - Vérifier que le dossier de destination existe
+   - Vérifier les permissions du dossier
+   - Le système utilisera automatiquement un dossier de secours si le dossier principal n'est pas accessible
+
+3. Pour les appareils iOS :
+   - Utiliser Safari
+   - Accepter le certificat de sécurité
+   - Autoriser l'accès à la caméra pour la signature
