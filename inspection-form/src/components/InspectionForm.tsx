@@ -21,6 +21,20 @@ import { InspectionForm } from '../types/InspectionTypes';
 import { INSPECTION_SECTIONS } from '../constants/inspectionData';
 import { saveLocally } from '../services/OneDriveService';
 
+// Fonction pour générer les valeurs par défaut pour toutes les sections d'inspection
+const generateDefaultInspectionValues = (sections: any) => {
+    const defaultValues: any = {};
+    Object.entries(sections).forEach(([key, section]: [string, any]) => {
+        defaultValues[key] = {
+            items: section.items.map(() => ({
+                isOk: null,
+                comments: ''
+            }))
+        };
+    });
+    return defaultValues;
+};
+
 // Styles personnalisés
 const InspectionCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
@@ -83,6 +97,7 @@ const RadioButton = styled(Box, {
 
 const InspectionFormComponent: React.FC = () => {
     const signatureRef = useRef<SignaturePadRef>(null);
+
     const { control, handleSubmit, reset } = useForm<InspectionForm>({
         defaultValues: {
             date: '',
@@ -91,10 +106,10 @@ const InspectionFormComponent: React.FC = () => {
             truckNumber: '',
             registration: '',
             department: '',
+            visualInspection: generateDefaultInspectionValues(INSPECTION_SECTIONS.visualInspection),
+            operationalInspection: generateDefaultInspectionValues(INSPECTION_SECTIONS.operationalInspection)
         }
-    });
-
-    const onSubmit = async (data: InspectionForm) => {
+    }); const onSubmit = async (data: InspectionForm) => {
         try {
             if (signatureRef.current) {
                 if (signatureRef.current.isEmpty()) {
@@ -108,6 +123,47 @@ const InspectionFormComponent: React.FC = () => {
                 alert('Veuillez saisir la date.');
                 return;
             }
+
+            // S'assurer que toutes les sections d'inspection sont présentes
+            // même celles non modifiées par l'utilisateur
+            if (!data.visualInspection) {
+                data.visualInspection = generateDefaultInspectionValues(INSPECTION_SECTIONS.visualInspection);
+            }
+
+            if (!data.operationalInspection) {
+                data.operationalInspection = generateDefaultInspectionValues(INSPECTION_SECTIONS.operationalInspection);
+            }            // Vérifier chaque section pour s'assurer qu'elle contient tous les éléments
+            Object.entries(INSPECTION_SECTIONS.visualInspection).forEach(([key, section]: [string, any]) => {
+                // Utiliser une assertion de type pour indiquer à TypeScript que c'est sûr
+                const sectionKey = key as keyof typeof data.visualInspection;
+
+                if (!data.visualInspection[sectionKey]) {
+                    (data.visualInspection as any)[sectionKey] = { items: [] };
+                }
+
+                // S'assurer que tous les items sont présents
+                if ((data.visualInspection as any)[sectionKey].items.length < section.items.length) {
+                    (data.visualInspection as any)[sectionKey].items = section.items.map((item: any, index: number) => {
+                        return (data.visualInspection as any)[sectionKey].items[index] || { isOk: null, comments: '' };
+                    });
+                }
+            });
+
+            // Faire de même pour les sections opérationnelles
+            Object.entries(INSPECTION_SECTIONS.operationalInspection).forEach(([key, section]: [string, any]) => {
+                // Utiliser une assertion de type pour indiquer à TypeScript que c'est sûr
+                const sectionKey = key as keyof typeof data.operationalInspection;
+
+                if (!data.operationalInspection[sectionKey]) {
+                    (data.operationalInspection as any)[sectionKey] = { items: [] };
+                }
+
+                if ((data.operationalInspection as any)[sectionKey].items.length < section.items.length) {
+                    (data.operationalInspection as any)[sectionKey].items = section.items.map((item: any, index: number) => {
+                        return (data.operationalInspection as any)[sectionKey].items[index] || { isOk: null, comments: '' };
+                    });
+                }
+            });
 
             await saveLocally(data);
             alert('Sauvegarde réussie');

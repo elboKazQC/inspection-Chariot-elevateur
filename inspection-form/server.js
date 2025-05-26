@@ -32,18 +32,27 @@ app.post('/api/save', async (req, res) => {
         }
 
         const fullPath = path.join(SAVE_PATH, fileName);
-        console.log('Sauvegarde dans:', fullPath);
-
-        // Ensure the destination folder exists before writing
+        console.log('Sauvegarde dans:', fullPath);        // Ensure the destination folder exists before writing
         await fs.mkdir(SAVE_PATH, { recursive: true });
-        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');        // Write a PDF summary alongside the JSON file
+        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');
+
+        // Write a PDF summary alongside the JSON file
         try {
+            console.log('Début de la génération du PDF');
             const pdfPath = fullPath.replace(/\.json$/, '.pdf');
-            const pdfContent = await generatePDF(formData);
+            console.log('Chemin du PDF:', pdfPath);
+            console.log('Données du formulaire:', JSON.stringify(formData, null, 2));
+            const pdfContent = await generatePDF(formData); console.log('PDF généré avec succès, contenu de taille:', pdfContent ? pdfContent.length : 'null');
+
+            if (!pdfContent) {
+                throw new Error('Le contenu du PDF est vide ou invalide');
+            }
+
             await fs.writeFile(pdfPath, pdfContent, 'binary');
-            console.log('PDF créé avec succès');
+            console.log('PDF écrit sur disque avec succès:', pdfPath);
         } catch (pdfErr) {
-            console.error('Erreur lors de la création du PDF:', pdfErr);
+            console.error('Erreur détaillée lors de la création du PDF:', pdfErr);
+            console.error('Stack trace:', pdfErr.stack);
         }
 
         console.log('Fichier sauvegardé avec succès');
@@ -75,6 +84,120 @@ app.get('/api/network-info', (req, res) => {
 
 app.get('/api/test', (req, res) => {
     res.json({ success: true, message: 'Le serveur fonctionne correctement!' });
+});
+
+// Endpoint to test PDF generation
+app.get('/api/test-pdf', async (req, res) => {
+    try {
+        console.log('Testing PDF generation...');
+
+        // Create a minimal test data structure
+        const testData = {
+            date: new Date().toISOString().split('T')[0],
+            operator: 'Test Operator',
+            truckNumber: 'TEST-123',
+            visualInspection: {
+                alimentation: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                fluides: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                roues: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                mat: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                equipementsSecurite: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                }
+            },
+            operationalInspection: {
+                freins: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                mat: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                conduite: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' },
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                },
+                fluides: {
+                    items: [
+                        { isOk: 'ok', comments: 'Test comment' }
+                    ]
+                }
+            }
+        };
+
+        // Generate PDF
+        const pdfBuffer = await generatePDF(testData);
+
+        console.log(`PDF generated successfully! Size: ${pdfBuffer ? pdfBuffer.length : 'null'} bytes`);
+
+        // Save the PDF to a file
+        const testPdfPath = path.join(FALLBACK_PATH, `test_${new Date().getTime()}.pdf`);
+        await fs.mkdir(FALLBACK_PATH, { recursive: true });
+        await fs.writeFile(testPdfPath, pdfBuffer);
+
+        console.log(`PDF saved to: ${testPdfPath}`);
+
+        res.json({
+            success: true,
+            message: 'PDF test completed successfully!',
+            pdfPath: testPdfPath,
+            pdfSize: pdfBuffer ? pdfBuffer.length : 0
+        });
+    } catch (error) {
+        console.error('Error in PDF test:', error);
+        console.error('Stack trace:', error.stack);
+        res.status(500).json({ success: false, error: error.message, stack: error.stack });
+    }
 });
 
 // Page de diagnostic
