@@ -48,17 +48,17 @@ function generatePDF(data) {
       isAddingPage = false;
     }
   };
-
   const buffers = [];
   doc.on('data', buffers.push.bind(buffers));
-
   const mainTitle = 'FICHE D\'INSPECTION DE CHARIOT \u00c9L\u00c9VATEUR';
-  const mainTitleWidth = doc.widthOfString(mainTitle);
-  const mainTitleX = (doc.page.width - mainTitleWidth) / 2;
-  doc.font('Helvetica-Bold')
-    .fontSize(16)
-    .text(mainTitle, mainTitleX, doc.y)
-    .moveDown(1);
+  doc.moveDown(0.5); // Ajoute un peu d'espace avant le titre
+  doc.font('Helvetica-Bold').fontSize(18); // Augmente un peu la taille
+  // Utilisation de l'alignement centré natif de PDFKit
+  doc.text(mainTitle, {
+    align: 'center',
+    width: doc.page.width - 100 // Tenir compte des marges
+  })
+  .moveDown(1.5); // Augmente l'espace après le titre
 
   const date = cleanValue(data.date) || new Date().toLocaleDateString('fr-CA');
   const operator = cleanValue(data.operator) || '';
@@ -72,10 +72,10 @@ function generatePDF(data) {
     .text('Op\u00e9rateur: ' + operator, 50, infoY + 20)
     .text('D\u00e9partement: ' + department, 50, infoY + 40);
   doc.text('Chariot #: ' + truckNumber, 300, infoY)
-    .text('Immatriculation: ' + registration, 300, infoY + 20);
-  doc.moveDown(3);
+    .text('Immatriculation: ' + registration, 300, infoY + 20);  doc.moveDown(3);
   function drawCenteredTitle(title, fontSize = 12, underline = true) {
     doc.font('Helvetica-Bold').fontSize(fontSize);
+    // Revenir à la méthode originale de centrage
     const titleWidth = doc.widthOfString(title);
     const x = (doc.page.width - titleWidth) / 2;
     doc.text(title, x, doc.y, { underline });
@@ -108,10 +108,10 @@ function generatePDF(data) {
     doc.font('Helvetica').fontSize(10);
 
     sectionDefinition.items.forEach((itemDef, index) => {
-      const item = sectionData.items[index] || {};
-      if (y + rowHeight > doc.page.height - 100) {
+      const item = sectionData.items[index] || {};      if (y + rowHeight > doc.page.height - 100) {
         doc.addPage();
         y = 80;
+        // S'assurer que les en-têtes ont la bonne police et taille
         doc.font('Helvetica-Bold').fontSize(10);
         doc.rect(margin, y, pageWidth, rowHeight).stroke();
         doc.text('Élément à inspecter', margin + 5, y + 5, { width: col1Width - 10 });
@@ -119,6 +119,8 @@ function generatePDF(data) {
         doc.text('État Non OK', margin + col1Width + col2Width + 10, y + 5, { width: col3Width - 20, align: 'center' });
         doc.text('Commentaires', margin + col1Width + col2Width + col3Width + 5, y + 5, { width: col4Width - 10 });
         y += rowHeight;
+        // Revenir à la police normale pour les lignes suivantes
+        doc.font('Helvetica').fontSize(10);
       }
 
       doc.rect(margin, y, pageWidth, rowHeight).stroke();
@@ -135,9 +137,10 @@ function generatePDF(data) {
       if (item.isOk === 'notOk') {
         doc.moveTo(notOkBoxX + 2, checkboxY + 2).lineTo(notOkBoxX + 6, checkboxY + 6)
           .moveTo(notOkBoxX + 6, checkboxY + 2).lineTo(notOkBoxX + 2, checkboxY + 6).stroke();
-      }
-      if (!item.isOk || (item.isOk !== 'ok' && item.isOk !== 'notOk')) {
+      }      if (!item.isOk || (item.isOk !== 'ok' && item.isOk !== 'notOk')) {
         doc.font('Helvetica').fontSize(8).text('N/A', okBoxX - 5, checkboxY, { width: col2Width, align: 'center' });
+        // Réinitialisation de la police à la taille normale après le N/A
+        doc.font('Helvetica').fontSize(10);
       }
       if (item.comments && item.comments.trim()) {
         const comment = cleanValue(item.comments);
@@ -147,6 +150,8 @@ function generatePDF(data) {
           height: rowHeight - 6,
           ellipsis: true
         });
+        // Réinitialisation de la police à la taille normale après les commentaires
+        doc.font('Helvetica').fontSize(10);
       }
       y += rowHeight;
     });
@@ -172,8 +177,7 @@ function generatePDF(data) {
   doc.moveDown(0.5);
 
   let currentY = doc.y;
-  Object.entries(data.visualInspection || {}).forEach(([key, section]) => {
-    if (INSPECTION_SECTIONS.visualInspection[key]) {
+  Object.entries(data.visualInspection || {}).forEach(([key, section]) => {    if (INSPECTION_SECTIONS.visualInspection[key]) {
       const sectionDef = INSPECTION_SECTIONS.visualInspection[key];
       const estimatedHeight = 40 + (sectionDef.items.length * 25) + 60;
       if (doc.y + estimatedHeight > doc.page.height - 100) {
@@ -183,6 +187,8 @@ function generatePDF(data) {
       doc.font('Helvetica-Bold').fontSize(11).text(sectionDef.title, 50, doc.y, { underline: true });
       currentY = drawInspectionTable(section, sectionDef, doc.y);
       doc.y = currentY;
+      // S'assurer que la police revient à la taille normale après chaque section
+      doc.font('Helvetica').fontSize(10);
       doc.moveDown(0.8);
     }
   });
@@ -196,8 +202,7 @@ function generatePDF(data) {
   drawCenteredTitle('INSPECTION OPÉRATIONNELLE', 12);
   doc.moveDown(1);
 
-  Object.entries(data.operationalInspection || {}).forEach(([key, section]) => {
-    if (INSPECTION_SECTIONS.operationalInspection[key]) {
+  Object.entries(data.operationalInspection || {}).forEach(([key, section]) => {    if (INSPECTION_SECTIONS.operationalInspection[key]) {
       const sectionDef = INSPECTION_SECTIONS.operationalInspection[key];
       const estimatedHeight = 40 + (sectionDef.items.length * 25) + 60;
       if (doc.y + estimatedHeight > doc.page.height - 100) {
@@ -206,6 +211,8 @@ function generatePDF(data) {
       doc.font('Helvetica-Bold').fontSize(11).text(sectionDef.title, 50, doc.y, { underline: true });
       currentY = drawInspectionTable(section, sectionDef, doc.y);
       doc.y = currentY;
+      // S'assurer que la police revient à la taille normale après chaque section
+      doc.font('Helvetica').fontSize(10);
       doc.moveDown(0.8);
     }
   });

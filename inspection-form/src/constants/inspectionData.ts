@@ -1,6 +1,5 @@
 export const INSPECTION_SECTIONS = {
-    visualInspection: {
-        alimentation: {
+    visualInspection: {        alimentation: {
             title: 'Alimentation',
             items: [
                 { name: 'Batterie' },
@@ -10,13 +9,14 @@ export const INSPECTION_SECTIONS = {
                 { name: 'Bonbonne de propane' },
                 { name: 'Connecteur' },
                 { name: 'Valve' },
+                { name: 'Attache' }
             ]
         },
         fluides: {
             title: 'Fluides',
             items: [
-                { name: 'Huile du moteur' },
                 { name: 'Eau/antigel' },
+                { name: 'Huile du moteur' },
                 { name: 'Fluides hydrauliques' }
             ]
         },
@@ -30,19 +30,19 @@ export const INSPECTION_SECTIONS = {
         mat: {
             title: 'Mât',
             items: [
-                { name: 'Desseret de charge' },
+                { name: 'Dosseret de charge' },
                 { name: 'Fourches/pinces' },
-                { name: 'État des chaînes' },
-                { name: 'Cylindre' },
-                { name: 'État des tuyaux hydrauliques' }
+                { name: 'État des chaines' },
+                { name: 'État des tuyaux hydrauliques' },
+                { name: 'Cylindres' }
             ]
         },
         equipementsSecurite: {
-            title: 'Équipements de sécurité',
+            title: 'Equipements de sécurité',
             items: [
                 { name: 'Feux avertisseurs' },
                 { name: 'Klaxon' },
-                { name: 'Alarmes' },
+                { name: 'Phares' },
                 { name: 'Avertisseur sonore' },
                 { name: 'Siège et ceinture de sécurité' }
             ]
@@ -57,13 +57,11 @@ export const INSPECTION_SECTIONS = {
             ]
         },
         mat: {
-            title: 'Mât',
+            title: 'Mat',
             items: [
                 { name: 'Contrôle de l\'élévation' },
-                { name: 'Contrôle de l\'inclinaison du mât (tilt)' },
-                { name: 'Contrôle de déplacements latéraux' },
-                { name: 'Side shift' },
-                { name: 'Contrôle de fermeture et d\'ouverture des pinces' }
+                { name: 'Contrôle de l\'inclinaison du mat (tilt)' },
+                { name: 'Contrôle de déplacements latéraux' }
             ]
         },
         conduite: {

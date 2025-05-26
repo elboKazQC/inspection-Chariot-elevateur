@@ -56,6 +56,7 @@ This script handles permission issues that may occur in the Codex environment an
    - Accepter le certificat auto-signé
    - Autoriser l'accès à la caméra pour la signature
 
+<!-- La version standard n'est plus supportée, seule la version iOS est maintenue
 ### Pour les autres appareils (Android, PC)
 1. Ouvrir PowerShell en tant qu'administrateur
 2. Exécuter les commandes suivantes :
@@ -68,6 +69,7 @@ This script handles permission issues that may occur in the Codex environment an
 3. L'application sera accessible aux adresses suivantes :
    - Localement : http://localhost:3000
    - Sur le réseau : http://[VOTRE-IP]:3000
+-->
 
 ### Running tests
 After installing dependencies with `setup.sh` or `setup.ps1`, you can execute the unit tests:
