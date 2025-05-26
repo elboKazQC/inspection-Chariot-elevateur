@@ -1,8 +1,10 @@
-// Charger les variables d'environnement
+// Serveur HTTPS pour iOS - résout les problèmes de connexion sur iPhone/iPad
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
+const https = require('https');
+const httpsLocalhost = require('https-localhost');
 const cors = require('cors');
 const fs = require('fs').promises;
 const os = require('os');
@@ -12,12 +14,14 @@ const networkInterfaces = os.networkInterfaces();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
+
 // Chemin principal - essaie d'abord le chemin original
 let SAVE_PATH = 'C:\\Users\\vcasaubon.NOOVELIA\\Noovelia\\!SST - General\\Inspection chariot élévateur\\Fiche inspection app';
 // Alternative: créer un dossier dans le répertoire utilisateur courant
 const FALLBACK_PATH = path.join(os.homedir(), 'ForkliftInspections');
 
-// Configuration CORS spécifique pour iOS
+// Configuration CORS spécifique pour iOS avec HTTPS
 app.use(cors({
     origin: true, // Accepter toutes les origines pour les tests
     credentials: true,
@@ -29,18 +33,18 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' })); // Augmenter la limite pour les signatures/images
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Middleware pour ajouter des en-têtes spécifiques à iOS
+// Middleware pour ajouter des en-têtes spécifiques à iOS avec HTTPS
 app.use((req, res, next) => {
     // Autoriser l'accès depuis les navigateurs iOS
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     
-    // En-têtes pour améliorer la compatibilité iOS
+    // En-têtes pour améliorer la compatibilité iOS avec HTTPS
     res.header('X-Frame-Options', 'SAMEORIGIN');
     res.header('X-Content-Type-Options', 'nosniff');
-    
-    // Pour gérer les requêtes OPTIONS (preflight)
+    res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+      // Pour gérer les requêtes OPTIONS (preflight)
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);
     } else {
@@ -48,10 +52,9 @@ app.use((req, res, next) => {
     }
 });
 
-app.use(express.static('build'));
-
+// Copier toutes les routes de server.js
 app.post('/api/save', async (req, res) => {
-    console.log('Requête de sauvegarde reçue');
+    console.log('Requête de sauvegarde reçue via HTTPS');
     try {
         const formData = req.body;
         const fileName = `inspection_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
@@ -65,15 +68,18 @@ app.post('/api/save', async (req, res) => {
         }
 
         const fullPath = path.join(SAVE_PATH, fileName);
-        console.log('Sauvegarde dans:', fullPath);        // Ensure the destination folder exists before writing
+        console.log('Sauvegarde dans:', fullPath);
+        
         await fs.mkdir(SAVE_PATH, { recursive: true });
-        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');        // Write a PDF summary alongside the JSON file
+        await fs.writeFile(fullPath, JSON.stringify(formData, null, 2), 'utf8');
+        
+        // Générer le PDF
         try {
             console.log('Début de la génération du PDF');
             const pdfPath = fullPath.replace(/\.json$/, '.pdf');
             console.log('Chemin du PDF:', pdfPath);
-            console.log('Données du formulaire:', JSON.stringify(formData, null, 2));
-            const pdfContent = await generatePDF(formData); console.log('PDF généré avec succès, contenu de taille:', pdfContent ? pdfContent.length : 'null');
+            const pdfContent = await generatePDF(formData);
+            console.log('PDF généré avec succès, contenu de taille:', pdfContent ? pdfContent.length : 'null');
 
             if (!pdfContent) {
                 throw new Error('Le contenu du PDF est vide ou invalide');
@@ -83,27 +89,19 @@ app.post('/api/save', async (req, res) => {
             console.log('PDF écrit sur disque avec succès:', pdfPath);
         } catch (pdfErr) {
             console.error('Erreur détaillée lors de la création du PDF:', pdfErr);
-            console.error('Stack trace:', pdfErr.stack);
         }
 
-        // Vérifier s'il y a des problèmes et envoyer un email d'alerte si nécessaire
+        // Envoyer email d'alerte si nécessaire
         try {
-            console.log('Vérification des problèmes dans l\'inspection...');
             const emailResult = await sendInspectionAlert(formData);
-
             if (emailResult.success && emailResult.issues > 0) {
                 console.log(`✅ Email d'alerte envoyé avec succès pour ${emailResult.issues} problème(s)`);
-            } else if (emailResult.issues === 0) {
-                console.log('✅ Aucun problème détecté - pas d\'email envoyé');
-            } else {
-                console.warn('⚠️  Échec de l\'envoi de l\'email d\'alerte:', emailResult.message);
             }
         } catch (emailErr) {
             console.error('❌ Erreur lors de l\'envoi de l\'email d\'alerte:', emailErr);
-            // Ne pas faire échouer la sauvegarde si l'email échoue
         }
 
-        console.log('Fichier sauvegardé avec succès');
+        console.log('Fichier sauvegardé avec succès via HTTPS');
         res.json({ success: true, message: 'Fichier sauvegardé avec succès' });
     } catch (error) {
         console.error('Erreur détaillée lors de la sauvegarde:', error);
@@ -111,13 +109,10 @@ app.post('/api/save', async (req, res) => {
     }
 });
 
-// Routes de diagnostic pour aider à la connexion
 app.get('/api/network-info', (req, res) => {
-    // Obtenez toutes les adresses IP
     const addresses = [];
     Object.keys(networkInterfaces).forEach(ifname => {
         networkInterfaces[ifname].forEach(iface => {
-            // Filtrer les adresses IPv4 et non-internes
             if (iface.family === 'IPv4') {
                 addresses.push(iface.address);
             }
@@ -126,7 +121,9 @@ app.get('/api/network-info', (req, res) => {
     res.json({
         addresses,
         port: PORT,
-        message: 'Ceci est votre information réseau'
+        httpsPort: HTTPS_PORT,
+        message: 'Serveur HTTPS pour iOS - Information réseau',
+        protocol: 'HTTPS'
     });
 });
 
@@ -137,12 +134,14 @@ app.get('/api/test', (req, res) => {
     
     res.json({ 
         success: true, 
-        message: 'Le serveur fonctionne correctement!',
+        message: 'Le serveur HTTPS fonctionne correctement pour iOS!',
         deviceInfo: {
             userAgent,
             isIOS,
             isSafari,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            protocol: 'HTTPS',
+            secure: true
         }
     });
 });
@@ -310,22 +309,60 @@ app.get('/api/test-pdf', async (req, res) => {
     }
 });
 
-// Page de diagnostic
+// Page de diagnostic mise à jour pour HTTPS
 app.get('/connection-info', (req, res) => {
-    res.sendFile(path.join(__dirname, 'connection-info.html'));
+    res.sendFile(path.join(__dirname, 'connection-info-https.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    const interfaces = Object.keys(networkInterfaces).map(ifname => {
-        const validInterfaces = networkInterfaces[ifname].filter(iface =>
-            iface.family === 'IPv4' && !iface.internal);
-        return validInterfaces.map(iface => iface.address);
-    }).flat();
+// Servir les fichiers statiques React depuis le dossier build
+app.use(express.static(path.join(__dirname, 'build')));
 
-    console.log(`Serveur démarré sur le port ${PORT}`);
-    console.log(`Adresses IP disponibles:`);
-    interfaces.forEach(ip => {
-        console.log(`  http://${ip}:${PORT}`);
-    });
-    console.log(`Page de diagnostic: http://localhost:${PORT}/connection-info`);
+// Rediriger toutes les autres routes vers l'application React (utilisation d'un handler plus spécifique)
+app.use((req, res, next) => {
+    // Si ce n'est pas une route API et que le fichier n'existe pas, servir index.html
+    if (!req.url.startsWith('/api/')) {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    } else {
+        next();
+    }
 });
+
+// Démarrer le serveur HTTPS
+async function startServer() {
+    try {
+        console.log('Génération des certificats HTTPS locaux...');
+        
+        // Utiliser https-localhost pour créer un serveur avec certificats auto-signés
+        const httpsServer = await httpsLocalhost.default(HTTPS_PORT, {
+            key: undefined,  // Auto-généré
+            cert: undefined  // Auto-généré
+        }, app);
+        
+        console.log('🔒 Serveur HTTPS démarré avec certificats auto-signés...');
+        
+        const interfaces = Object.keys(networkInterfaces).map(ifname => {
+            const validInterfaces = networkInterfaces[ifname].filter(iface =>
+                iface.family === 'IPv4' && !iface.internal);
+            return validInterfaces.map(iface => iface.address);
+        }).flat();
+
+        console.log(`🔒 Serveur HTTPS démarré sur le port ${HTTPS_PORT}`);
+        console.log(`📱 Adresses HTTPS pour iOS:`);        interfaces.forEach(ip => {
+            console.log(`  https://${ip}:${HTTPS_PORT}`);
+        });
+        console.log(`🔧 Page de diagnostic: https://localhost:${HTTPS_PORT}/connection-info`);
+        console.log(`\n✅ Configuration optimisée pour iOS/iPhone/iPad`);
+        console.log(`⚠️  Vous devrez accepter le certificat auto-signé sur iOS`);
+        
+    } catch (error) {
+        console.error('Erreur lors du démarrage du serveur HTTPS:', error);
+        console.log('Retour au serveur HTTP normal...');
+        
+        // Fallback vers HTTP si HTTPS échoue
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`⚠️  Serveur HTTP de fallback sur le port ${PORT}`);
+        });
+    }
+}
+
+startServer();

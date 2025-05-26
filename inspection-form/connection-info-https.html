@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Connexion HTTPS pour iOS - Application d'inspection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .address {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .address a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .address:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        .ios-badge {
+            display: inline-block;
+            background: #007AFF;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .steps {
+            margin-top: 30px;
+        }
+
+        .step {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .step h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        .troubleshooting {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 165, 0, 0.2);
+            border-left: 4px solid #ff9800;
+            border-radius: 10px;
+        }
+
+        .troubleshooting h2 {
+            color: #ffcc02;
+        }
+
+        .security-notice {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .security-notice h3 {
+            color: #ffc107;
+            margin-top: 0;
+        }
+
+        .test-button {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔒 Connexion HTTPS pour iOS<span class="ios-badge">📱 iOS Optimisé</span></h1>
+
+        <div class="security-notice">
+            <h3>🚨 Important pour iOS/iPhone</h3>
+            <p>Cette version utilise HTTPS pour une meilleure compatibilité avec iOS. Vous devrez <strong>accepter le certificat</strong> lors de la première connexion.</p>
+        </div>
+
+        <p>Pour vous connecter à l'application depuis votre iPhone/iPad, utilisez ces adresses HTTPS dans Safari :</p>
+
+        <div class="address">
+            <a href="https://10.136.136.143:8443" target="_blank">🔗 https://10.136.136.143:8443</a>
+        </div>
+        <div class="address">
+            <a href="https://172.21.160.1:8443" target="_blank">🔗 https://172.21.160.1:8443</a>
+        </div>
+
+        <div class="steps">
+            <h2>📋 Étapes pour iOS :</h2>
+
+            <div class="step">
+                <h3><span class="emoji">📶</span>1. Même réseau WiFi</h3>
+                <p>Assurez-vous que votre iPhone/iPad et cet ordinateur sont connectés au <strong>même réseau WiFi d'entreprise</strong>.</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="emoji">🔗</span>2. Ouvrir le lien HTTPS</h3>
+                <p>Dans Safari sur votre iPhone, cliquez sur l'un des liens HTTPS ci-dessus.</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="emoji">🛡️</span>3. Accepter le certificat</h3>
+                <p>iOS affichera un avertissement de sécurité. Cliquez sur <strong>"Avancé"</strong> puis <strong>"Continuer vers le site"</strong>.</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="emoji">✅</span>4. Tester la connexion</h3>
+                <p>L'application d'inspection devrait maintenant se charger correctement avec toutes les fonctionnalités iOS.</p>
+            </div>
+        </div>
+
+        <div class="troubleshooting">
+            <h2>🔧 Dépannage spécifique iOS :</h2>
+            <ul>
+                <li><strong>🚫 "Connexion non sécurisée" :</strong> Normal avec HTTPS local. Cliquez "Avancé" → "Continuer".</li>
+                <li><strong>📱 Page blanche sur iPhone :</strong> Désactivez le "Mode Privé" dans Safari et rafraîchissez.</li>
+                <li><strong>🔄 Application lente :</strong> Fermez les autres onglets Safari et redémarrez Safari si nécessaire.</li>
+                <li><strong>✍️ Signatures ne fonctionnent pas :</strong> Utilisez Safari (pas Chrome) pour une meilleure compatibilité tactile.</li>
+                <li><strong>📷 Problème avec l'appareil photo :</strong> HTTPS résout les problèmes d'accès à la caméra sur iOS.</li>
+                <li><strong>🔐 Certificat refusé :</strong> Allez dans Réglages > Général > À propos > Réglages de certificat et faites confiance au certificat.</li>
+            </ul>
+
+            <h3>🧪 Tests de connectivité :</h3>
+            <p>Cliquez sur ces liens depuis votre iPhone pour tester :</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="/api/test" class="test-button" target="_blank">🔍 Test de connexion iOS</a>
+                <a href="/api/network-info" class="test-button" target="_blank">📡 Info réseau</a>
+            </div>
+            <p><small>💡 Si ces liens fonctionnent, l'application principale devrait aussi fonctionner parfaitement.</small></p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; font-size: 12px; opacity: 0.8;">
+            <p>🔒 Serveur HTTPS optimisé pour iOS | Port 8443</p>
+        </div>
+    </div>
+</body>
+
+</html>
