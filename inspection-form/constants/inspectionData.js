@@ -55,13 +55,13 @@ const INSPECTION_SECTIONS = {
                 { name: 'Freins' },
                 { name: 'Frein manuel' }
             ]
-        },
-        mat: {
+        },        mat: {
             title: 'Mat',
             items: [
                 { name: 'Contrôle de l\'élévation' },
                 { name: 'Contrôle de l\'inclinaison du mat (tilt)' },
-                { name: 'Contrôle de déplacements latéraux' }
+                { name: 'Contrôle de déplacements latéraux' },
+                { name: 'Contrôle de fermeture et d\'ouverture des pinces' }
             ]
         },
         conduite: {
