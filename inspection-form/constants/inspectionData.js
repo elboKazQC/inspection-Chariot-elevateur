@@ -1,5 +1,6 @@
 const INSPECTION_SECTIONS = {
-    visualInspection: {        alimentation: {
+    visualInspection: {
+        alimentation: {
             title: 'Alimentation',
             items: [
                 { name: 'Batterie' },
@@ -53,9 +54,9 @@ const INSPECTION_SECTIONS = {
             title: 'Freins',
             items: [
                 { name: 'Freins' },
-                { name: 'Frein manuel' }
-            ]
-        },        mat: {
+                { name: 'Frein manuel' }            ]
+        },
+        mat: {
             title: 'Mat',
             items: [
                 { name: 'Contrôle de l\'élévation' },

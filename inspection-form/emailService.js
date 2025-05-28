@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { INSPECTION_SECTIONS } = require('./constants/inspectionData');
 
 // Configuration du transporteur d'email
 // Vous devrez personnaliser ces paramètres selon votre serveur de messagerie
@@ -41,10 +42,17 @@ function analyzeInspectionIssues(data) {
             if (section.items) {
                 section.items.forEach((item, index) => {
                     if (item.isOk === 'notOk') {
+                        // Récupérer le nom réel de l'élément depuis les données de référence
+                        const sectionData = INSPECTION_SECTIONS.visualInspection[sectionKey];
+                        const elementName = sectionData && sectionData.items[index] 
+                            ? sectionData.items[index].name 
+                            : `Élément #${index + 1}`;
+
                         issues.push({
                             type: 'Inspection visuelle',
                             section: sectionKey,
                             itemIndex: index + 1,
+                            elementName: elementName,
                             comments: item.comments || 'Aucun commentaire'
                         });
                     }
@@ -59,10 +67,17 @@ function analyzeInspectionIssues(data) {
             if (section.items) {
                 section.items.forEach((item, index) => {
                     if (item.isOk === 'notOk') {
+                        // Récupérer le nom réel de l'élément depuis les données de référence
+                        const sectionData = INSPECTION_SECTIONS.operationalInspection[sectionKey];
+                        const elementName = sectionData && sectionData.items[index] 
+                            ? sectionData.items[index].name 
+                            : `Élément #${index + 1}`;
+
                         issues.push({
                             type: 'Inspection opérationnelle',
                             section: sectionKey,
                             itemIndex: index + 1,
+                            elementName: elementName,
                             comments: item.comments || 'Aucun commentaire'
                         });
                     }
@@ -119,15 +134,13 @@ function createEmailContent(data, issues) {
             <h3 style="color: #d32f2f;">⚠️ Problèmes détectés (${issues.length})</h3>
 
             <div style="background-color: #ffebee; border-left: 4px solid #d32f2f; padding: 15px; margin: 15px 0;">
-    `;
-
-    issues.forEach((issue, index) => {
+    `;    issues.forEach((issue, index) => {
         html += `
             <div style="margin-bottom: 15px; padding: 10px; background-color: white; border-radius: 3px;">
                 <h4 style="margin: 0 0 5px 0; color: #d32f2f;">Problème ${index + 1}</h4>
                 <p style="margin: 5px 0;"><strong>Type:</strong> ${issue.type}</p>
                 <p style="margin: 5px 0;"><strong>Section:</strong> ${issue.section}</p>
-                <p style="margin: 5px 0;"><strong>Élément:</strong> #${issue.itemIndex}</p>
+                <p style="margin: 5px 0;"><strong>Élément:</strong> ${issue.elementName}</p>
                 <p style="margin: 5px 0;"><strong>Commentaires:</strong> ${issue.comments}</p>
             </div>
         `;
@@ -186,12 +199,10 @@ async function sendInspectionAlert(data) {
                 console.log(`📧 CC : ${process.env.EMAIL_CC}`);
             }
             console.log(`📋 Sujet : 🚨 ALERTE INSPECTION - ${issues.length} problème(s) détecté(s) - Chariot ${data.truckNumber || 'N/A'}`);
-            console.log(`📝 Contenu : Email HTML généré avec ${issues.length} problème(s) détaillé(s)`);
-
-            // Afficher les détails des problèmes en mode démo
+            console.log(`📝 Contenu : Email HTML généré avec ${issues.length} problème(s) détaillé(s)`);            // Afficher les détails des problèmes en mode démo
             console.log('📋 Problèmes détectés :');
             issues.forEach((issue, index) => {
-                console.log(`   ${index + 1}. ${issue.type} - ${issue.section} - Élément #${issue.itemIndex}`);
+                console.log(`   ${index + 1}. ${issue.type} - ${issue.section} - ${issue.elementName}`);
                 console.log(`      💬 "${issue.comments}"`);
             });
 
